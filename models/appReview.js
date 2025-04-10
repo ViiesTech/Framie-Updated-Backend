@@ -33,7 +33,7 @@ const appReviewSchema = new Schema({
         type: String,
         required: true
     }
-});
+}, {timestamps: true});
 
 const appReviewModel = mongoose.model("AppReview", appReviewSchema);
 module.exports = appReviewModel;

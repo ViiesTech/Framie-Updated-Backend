@@ -7,6 +7,7 @@ const clientProfile = require("../controllers/clientProfile");
 router.post("/user/addReviews", reviewController.createReview);
 router.get("/user/getReviews", reviewController.getReview);
 router.get("/user/getAllReviews", reviewController.getAllReviews);
+router.post("/admin/deleteReview", reviewController.deleteReviewById);
 
 router.post("/admin/createClientProfile", clientProfile.createClientProfile);
 router.get("/admin/clientProfile", clientProfile.getClientProfile);

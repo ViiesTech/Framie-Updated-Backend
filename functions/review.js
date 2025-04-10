@@ -73,13 +73,23 @@ const getAllReviewsByAdmin = async (req) => {
             model: "Service",
             select: "Title"
         }
+    }).populate({
+        path: "onStylist",
+        select: "employeeName"
     })
+    return result;
+};
+
+const deleteReview = async (req) => {
+    const { reviewId } = req.query;
+    const result = await reviewModel.findByIdAndDelete({_id: reviewId});
     return result;
 };
 
 module.exports = {
     createReview, 
     getReviewsByType,
-    getAllReviewsByAdmin
+    getAllReviewsByAdmin,
+    deleteReview
 }
 

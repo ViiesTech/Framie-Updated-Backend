@@ -59,10 +59,28 @@ const getAllReviews = async (req, res) => {
             error: error.message
         })
     }
-}
+};
+
+const deleteReviewById = async (req, res) => {
+    try {
+        const review = await revireFunction.deleteReview(req);
+        return res.status(200).json({
+            success: true,
+            msg: "Review is Deleted Successfully!"
+        })
+    } catch (error) {
+        console.log("Having Errors :", error);
+        return res.status(403).json({
+            success: false,
+            msg: "having Errors!",
+            error: error.message
+        })
+    }
+};
 
 module.exports = {
     createReview,
     getReview,
-    getAllReviews
+    getAllReviews,
+    deleteReviewById
 };
