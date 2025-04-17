@@ -4,12 +4,32 @@ const bcrypt = require("bcrypt");
 
 
 const signup = async (req) => {
-    const newUser = new userModel(req.body);
+    const { firstName, lastName, phNumber, city, email } = req.body;
     const hash = await bcrypt.hash(req.body.password, 10);
-    newUser.password = hash;
+    const newUser = new userModel({
+        firstName,
+        lastName,
+        phNumber,
+        city,
+        email,
+        password: hash,
+    });
     const result = await newUser.save();
     return result;
 };
+
+const signupByGoogle = async (req) => {
+    const { email, phNumber } = req.body;
+    const hash = await bcrypt.hash("123456789", 10);
+    const newUser = new userModel({
+        email,
+        phNumber,
+        password: hash,
+        isVerified: true
+    });
+    const result = await newUser.save();
+    return result
+}; 
 
 const generateOTP = async (userId) => {
     console.log("object: ", userId)
@@ -64,6 +84,7 @@ const getUserForOTP = async (userId) =>{
 
 module.exports = {
     signup,
+    signupByGoogle,
     generateOTP,
     verifyOTP,
     verifyUser,

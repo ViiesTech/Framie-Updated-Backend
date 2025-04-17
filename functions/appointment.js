@@ -1,12 +1,13 @@
-const appointmointModel = require("../models/appointmentModel");
+const appointmentModel = require("../models/appointmentModel");
+const moment = require("moment");
 
 const createAppointment = async (req) => {
   if(req.body.createdByModel === "Admin"){
-    const newAppointment = new appointmointModel(req.body);
+    const newAppointment = new appointmentModel(req.body);
     const result = await newAppointment.save();
     return result;
   } else {
-    const newAppointment = new appointmointModel(req.body);
+    const newAppointment = new appointmentModel(req.body);
     const result = await newAppointment.save();
     return result;
   } 
@@ -14,14 +15,14 @@ const createAppointment = async (req) => {
 
 const getAppointment = async (req) => {
     const appointmentId = req.query.appointmentId;
-    const appointment = await appointmointModel.findById({_id: appointmentId});
+    const appointment = await appointmentModel.findById({_id: appointmentId});
     return appointment;
 };
 
 const updateStatus = async (req) => {
     const { appointmentId, status} = req.body;
 
-    const appointment = await appointmointModel.findByIdAndUpdate({
+    const appointment = await appointmentModel.findByIdAndUpdate({
         _id: appointmentId},
         {$set: {status: status}},
         { new: true});
@@ -30,7 +31,7 @@ const updateStatus = async (req) => {
 
 const getAppointmentbyUser = async (req) => {
     const userId = req.query.userId;
-    const appointment = await appointmointModel.find({userId: userId});
+    const appointment = await appointmentModel.find({userId: userId});
     return appointment
 };
 
@@ -38,12 +39,12 @@ const getAppointmentbyAdmin = async (req) => {
     const {adminId, status} = req.query;
     console.log("object :", adminId);
     if(status === "All" || status === "all"){
-      const appointment = await appointmointModel.find({
+      const appointment = await appointmentModel.find({
         adminId: adminId
       });
       return appointment;
     } else {
-      const appointment = await appointmointModel.find({
+      const appointment = await appointmentModel.find({
         adminId: adminId,
         status: status
       });
@@ -55,13 +56,13 @@ const getAppointmentbyAdmin = async (req) => {
 const getAppointmentsByStylists = async (req) => {
   const { adminId, employeeId } = req.query;
   if(!employeeId){
-    const appointments = await appointmointModel.find({
+    const appointments = await appointmentModel.find({
       adminId: adminId
     });
     console.log("first :")
     return appointments
   } else {
-    const appointments = await appointmointModel.find({
+    const appointments = await appointmentModel.find({
       adminId: adminId,
       stylist: employeeId
     });
@@ -72,14 +73,13 @@ const getAppointmentsByStylists = async (req) => {
 
 const getTotalClients = async (req) => {
   const { adminId } = req.query;
-  const appointment = await appointmointModel.find({adminId: adminId}).countDocuments();
-  // console.log("first", appointment);
+  const appointment = await appointmentModel.find({adminId: adminId}).countDocuments();
   return appointment
 };
 
 const totalIncome = async (req) => {
   const { adminId } = req.query;
-  const income = await appointmointModel.find({
+  const income = await appointmentModel.find({
     adminId: adminId,
     status: "Completed"
   });
@@ -90,8 +90,36 @@ const totalIncome = async (req) => {
 
 const deleteAppointment = async (req) => {
     const { appointmentId } = req.query;
-    const result = await appointmointModel.findByIdAndDelete({_id: appointmentId});
+    const result = await appointmentModel.findByIdAndDelete({_id: appointmentId});
     return result 
+};
+
+const getTotalCustomers = async (req) => {
+  const { adminId, type } = req.query;
+  
+  const today = moment();
+  const filter = { adminId };
+
+  if(type === "day"){
+    const todaystr = today.format("D-M-YYYY");
+    filter.date = todaystr; 
+  } else if( type === "week"){
+    const weekDates = [];
+    for (let i = 0; i < 7; i++) {
+    weekDates.push(today.clone().subtract(i, 'days').format('D-M-YYYY'));
+    }
+    console.log("object", weekDates);
+    filter.date = { $in: weekDates };
+    // return
+  } else if( type === "month"){
+    const month = today.month() + 1;
+    const year = today.year();
+    filter.date = { $regex: new RegExp(`^\\d{1,2}-(0?${month})-${year}$`)};
+  }
+
+  const total = await appointmentModel.find(filter).countDocuments();
+  return total;
+
 };
 
 module.exports = { 
@@ -103,5 +131,6 @@ module.exports = {
     getAppointmentsByStylists,
     getTotalClients,
     totalIncome,
-    deleteAppointment
+    deleteAppointment,
+    getTotalCustomers
 };

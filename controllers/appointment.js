@@ -164,6 +164,24 @@ const deleteAppointment = async (req, res) => {
     }
 };
 
+const getTotalCustomers = async (req, res) => {
+    try {
+        const total = await appointmentFunction.getTotalCustomers(req);
+        return res.status(200).json({
+            success: true,
+            msg: "Total Customers By admin ID!",
+            data: total
+        })
+    } catch (error) {
+        console.log("Having Errors: ", error);
+        return res.status(403).json({
+            success: false,
+            msg: "Having Errors!",
+            error
+        })
+    }
+};
+
 module.exports = { 
     createAppointment,
     getAppointment,
@@ -172,5 +190,6 @@ module.exports = {
     getAppointmentbyAdmin,
     getAppointmentByStylists,
     getCustomers,
-    deleteAppointment
+    deleteAppointment,
+    getTotalCustomers
 };

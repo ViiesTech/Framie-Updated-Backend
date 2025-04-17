@@ -6,6 +6,7 @@ const userController = require("../controllers/user");
 const appointmentController = require("../controllers/appointment");
 
 router.post("/user/signup", userController.signUp);
+router.post("/user/signUpwithGoogle", userController.signInByGoogle);
 router.post("/user/login", userController.login);
 router.post("/user/verifyOTP", userController.verifyOTP);
 router.get("/user/getProfile", auth.verifyUser, userController.getProfile);

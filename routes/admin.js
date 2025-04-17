@@ -57,6 +57,7 @@ router.get("/admin/getAppointment", appointmentController.getAppointment);
 router.post("/admin/updateAppointment", appointmentController.updateStatus);
 router.get("/admin/getCustomers", appointmentController.getCustomers);
 router.get("/admin/appointmentByStylist",appointmentController.getAppointmentByStylists);
+router.get("/admin/getTotalCustomers", appointmentController.getTotalCustomers);
 
 // Appointments By User
 router.get("/user/getAppointmentsByUser", appointmentController.getAppointmentbyUser);
