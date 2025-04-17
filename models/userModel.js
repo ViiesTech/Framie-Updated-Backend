@@ -10,7 +10,7 @@ const userSchema = new Schema({
     },
     phNumber: {
         type: Number,
-        required: true,
+        // required: true,
     },
     city:{
         type: String,

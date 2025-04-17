@@ -19,11 +19,12 @@ const signup = async (req) => {
 };
 
 const signupByGoogle = async (req) => {
-    const { email, phNumber } = req.body;
+    const { email, firstName, lastName } = req.body;
     const hash = await bcrypt.hash("123456789", 10);
     const newUser = new userModel({
         email,
-        phNumber,
+        firstName,
+        lastName,
         password: hash,
         isVerified: true
     });

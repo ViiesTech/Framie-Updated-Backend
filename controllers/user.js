@@ -55,7 +55,8 @@ const signInByGoogle = async (req, res) => {
           {
             id: user._id,
             eamil: user.email,
-            phNumber: user.phNumber,
+            firstName: user.firstName,
+            lastName: user.lastName,
           },
           process.env.SECRET_KEY,
           { expiresIn: "1y" }
@@ -81,7 +82,8 @@ const signInByGoogle = async (req, res) => {
           {
             id: user._id,
             eamil: user.email,
-            phone: user.phone,
+            firstName: user.firstName,
+            lastName: user.lastName
           },
           process.env.SECRET_KEY,
           { expiresIn: "1y" }
@@ -110,6 +112,7 @@ const signInByGoogle = async (req, res) => {
     });
   }
 };
+
 const generateOTP = async (req, res) => {
   try {
     const userId = req.body.userId;
