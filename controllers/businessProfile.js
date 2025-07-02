@@ -3,18 +3,21 @@ const adminFunction = require("../functions/admin");
 
 const addBusinessProfile = async (req, res) => {
     try {
-        const createBusiness = await businessProfileFunction.addBusinessProfile(req);
-        if( createBusiness.length === 0){
-            return res.status(403).json({
-                success : false,
-                msg: "No business Profile Created!"
-            })
-        } else {
+        const exist = await businessProfileFunction.getBusinessProfile(req) 
+        if(exist === null){
+            const createBusiness = await businessProfileFunction.addBusinessProfile(req);
             await adminFunction.updateBusiness(req); 
             return res.status(200).json({
                 success: true,
                 msg: "Business Profile Created Successfully!",
                 data: createBusiness
+            })
+        } else {
+            await adminFunction.updateBusiness(req);
+            return res.status(200).json({
+                success : false,
+                msg: "Business Profile Already Created!",
+                data: exist
             })
         }; 
     } catch (error) {

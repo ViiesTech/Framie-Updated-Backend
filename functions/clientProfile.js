@@ -3,9 +3,9 @@ const appointmentModel = require("../models/appointmentModel");
 
 const createClientProfile = async (req) => {
     const { userId, adminId } = req.body;
-    const appointment = await appointmentModel.find({userId, userId},{_id: 1});
+    const appointment = await appointmentModel.find({userId, userId, adminId: adminId},{_id: 1});
     const previousAppointments = appointment.map(app => app._id);
-    const clientProfile = await clientProfileModel.findOne({userId: userId});
+    const clientProfile = await clientProfileModel.findOne({userId: userId, adminId: adminId});
     if(clientProfile === null){
         const newClientProfile = new clientProfileModel({
             adminId: adminId,
@@ -13,31 +13,40 @@ const createClientProfile = async (req) => {
             previousAppointments: previousAppointments
         });
         const result = await newClientProfile.save();
-        console.log("first :");
+        console.log("Client Profile Successfully Created!");
         return result
     } else {
-        const result = await clientProfileModel.findOneAndUpdate({userId: userId},
+        const result = await clientProfileModel.findOneAndUpdate({userId: userId, adminId: adminId},
             { $set: {previousAppointments: previousAppointments}},
             { new: true }
         );
-        console.log("Second :");
+        console.log("Client Profile Already Created!");
         return result
     }
 };
 
 const getClientProfile = async (req) => {
-    const { userId } = req.query;
-    const result = await clientProfileModel.findOne({userId: userId}).populate({
+    const { userId, adminId } = req.query;
+    const result = await clientProfileModel.findOne({userId: userId, adminId: adminId}).populate({
         path: "userId",
         select: "-password"
     }).populate({
         path: "previousAppointments",
-        options: { sort: { date: -1 } } 
+        options: { sort: { date: -1 } } ,
+        populate: [{
+            path: "services",
+            model: "Subservice"
+        },
+        {
+            path: "stylist",
+            model: "Employee",
+            select: "employeeName employeeImage about"
+        }]
     }).populate("stylists");
 
     if (result?.previousAppointments?.length) {
         result.previousAppointments.sort((a, b) => {
-            const order = { "Pending": 0, "Completed": 1 };
+            const order = { "Accepted": 0, "Completed": 1 };
             return order[a.status] - order[b.status];
         });
     }

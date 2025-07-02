@@ -33,6 +33,31 @@ const getAllBusinessProfiles = async (req) => {
     return allProfiles;
 };
 
+const getNearByBusinessProfiles = async (req) => {
+    const { logitude, latitude } = req.body;
+
+    const location = {
+        type: "Point",
+        coordinates: [
+            parseFloat(req.body.longitude),
+            parseFloat(req.body.latitude)
+        ]
+    };
+
+    const business = await businessModel.find({
+        location:{
+            $near:{
+                $geometry: {
+                    type: "Point",
+                    coordinates: location.coordinates
+                },
+                $maxdDistance: 100000
+            }
+        }
+    }); 
+    return business
+}; 
+
 
 
 module.exports = { 

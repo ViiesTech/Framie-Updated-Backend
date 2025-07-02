@@ -182,8 +182,8 @@ const getAllSubServicesByAdmin = async (req, res) => {
     try {
         const allServices = await serviceFunctions.getAllSubServicesByAdmin(req);
         if(allServices.length === 0){
-            return res.status(403).json({
-                sucess: false,
+            return res.status(200).json({
+                sucess: true,
                 msg: "No Services Found By Admin Id!",
             })
         } else {

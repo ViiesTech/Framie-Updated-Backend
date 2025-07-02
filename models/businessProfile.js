@@ -17,7 +17,7 @@ const businessSchema = new Schema({
     },
     userName:{
         type: String,
-        required: true
+        // required: true
     },
     city:{
         type: String,
@@ -51,10 +51,25 @@ const businessSchema = new Schema({
             required: true,
         }
     }],
-    location:{
-        type: String,
-    }
+    location: {
+        type:{
+            type: String,
+            enum: ["Point"] 
+        },
+        coordinates: {
+            type: [Number],
+        },
+        locationName: {
+            type: String
+        }
+    },
+    favoriteBy:[{
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }]
 }, { timestamps: true });
+
+businessSchema.index({ location: "2dsphere" });
 
 const businessModel = mongoose.model("BusinessDetail", businessSchema);
 module.exports = businessModel;

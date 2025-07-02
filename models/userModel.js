@@ -43,7 +43,22 @@ const userSchema = new Schema({
     customerAddress: {
         type: String,
     },
+    location: {
+        type:{
+            type: String,
+            enum: ["Point"] 
+        },
+        coordinates: {
+            type: [Number],
+        },
+        locationName: {
+            type: String
+        }
+    }
 }, { timestamps: true });
+
+userSchema.index({ location: "2dsphere" });
+
 
 const userModel = mongoose.model('User', userSchema);
 module.exports = userModel;

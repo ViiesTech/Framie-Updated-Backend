@@ -3,11 +3,18 @@ const billingModel = require("../models/billingModel");
 const bcrypt = require("bcrypt");
 
 //Admin Functions
-const signUp = async (req) => {
-    const newAdmin = new adminModel(req.body);
-    const hash = await bcrypt.hash(req.body.password, 10);
-    newAdmin.password = hash;
-    newAdmin.profileImage = req.file.filename;
+const signUp = async (decode) => {
+    const { firstName, lastName, email, password, phNumber, city, image } = decode
+    const hash = await bcrypt.hash(password, 10);
+    const newAdmin = new adminModel({
+        firstName,
+        lastName,
+        email,
+        password: hash,
+        phNumber,
+        city,
+        profileImage: image
+    });
     const result = await newAdmin.save();
     return result;
 };
@@ -47,8 +54,8 @@ const addBillingDetails = async (req) => {
 };
 
 const findBilling = async (req) => {
-    const username = req.body.username;
-    const exists = await billingModel.findOne({username: username});
+    const username = req.body.adminId;
+    const exists = await billingModel.findOne({adminId: username});
     if(exists){
         return true
     } else {
@@ -74,7 +81,7 @@ const getBillingDetails = async (req) => {
 
 const updateBusiness = async (req) => {
     const adminId = req.admin.id;
-    const admin = await adminModel.findByIdAndUpdate({adminId : adminId},
+    const admin = await adminModel.findByIdAndUpdate({ _id: adminId},
         { $set: {businessProfile: true}},
         { new: true}
     );
@@ -90,6 +97,12 @@ const updateBilling = async (req) => {
     return update;
 };
 
+const getAdminByAdminId = async (req) => {
+    const { adminId } = req.query;
+    const admin = await adminModel.findById({_id: adminId}).select("-password");
+    return admin
+};
+
 module.exports = { 
     signUp,
     getUser,
@@ -99,6 +112,7 @@ module.exports = {
     updateBillingDetails,
     getBillingDetails,
     updateBusiness,
-    updateBilling
+    updateBilling,
+    getAdminByAdminId
 };
 

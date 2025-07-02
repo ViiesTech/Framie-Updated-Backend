@@ -1,5 +1,6 @@
 const appointmentFunction = require("../functions/appointment");
 const clientProfileFunction = require("../functions/clientProfile");
+const royalityFunction = require("../functions/royalityPoint");
 
 const createAppointment = async (req, res) => {
     try {
@@ -11,7 +12,7 @@ const createAppointment = async (req, res) => {
             })
         } else {
             const clientProfile = await clientProfileFunction.createClientProfile(req);
-            console.log("Client Profile Created :", clientProfile);
+            // console.log("Client Profile Created :", clientProfile);
             return res.status(200).json({
                 success: true,
                 msg: "Appointment Created Successfully!",
@@ -49,11 +50,22 @@ const getAppointment = async (req, res) => {
 const updateStatus = async (req, res) => {
     try {
         const update = await appointmentFunction.updateStatus(req);
-        return res.status(200).json({
-            success: true,
-            msg: "Appointment Updated!",
-            data: update
-        })
+        console.log("object :", update.status);
+        // return 
+        if(update.status === "Completed"){
+            const royality = await royalityFunction.createRoyality(update);
+            return res.status(200).json({
+                success: true,
+                msg: "Appointment Marked As Completed!",
+                data: update
+            })
+        } else {
+            return res.status(200).json({
+                success: true,
+                msg: "Appointment Updated to Accepted!",
+                data: update
+            })
+        };
     } catch (error) {
         console.log("Having Errors: ", error);
         return res.status(403).json({
@@ -177,10 +189,46 @@ const getTotalCustomers = async (req, res) => {
         return res.status(403).json({
             success: false,
             msg: "Having Errors!",
-            error
+            error: error.message
         })
     }
 };
+
+const updateAppointment = async (req, res) => {
+    try {
+        const appointment = await appointmentFunction.updateAppointment(req);
+        return res.status(200).json({
+            success: true,
+            msg: "Appointment Details updated!",
+            data: appointment
+        })
+    } catch (error) {
+        console.log("Having Errors :", error);
+        return res.status(200).json({
+            success: false,
+            msg: "Having Errors",
+            error: error.message
+        })
+    }
+};
+
+const getRevenue = async (req, res) => {
+    try {
+        const revenue = await appointmentFunction.getyearlyRevenue(req);
+        return res.status(200).json({
+            success: true,
+            msg: "Yearly Revenue!",
+            data: revenue
+        })
+    } catch (error) {
+        console.log("Having Errors :", error);
+        return res.status(200).json({
+            success: false,
+            msg: "Having Errors",
+            error: error.message
+        })
+    }
+}
 
 module.exports = { 
     createAppointment,
@@ -191,5 +239,7 @@ module.exports = {
     getAppointmentByStylists,
     getCustomers,
     deleteAppointment,
-    getTotalCustomers
+    getTotalCustomers,
+    updateAppointment,
+    getRevenue
 };

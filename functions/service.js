@@ -10,10 +10,16 @@ const addService = async (req) => {
         // console.log("Exist", exist)
         return {data:exist, exist:true};
     } else {
-        const newService = new serviceModel(req.body);
-        newService.bannerImage = req.file.filename;
-        const result = await newService.save();
-        return result;
+        if(req.file && req.file.filename){
+            const newService = new serviceModel(req.body);
+            newService.bannerImage = req.file.filename;
+            const result = await newService.save();
+            return result;
+        } else {
+            const newService = new serviceModel(req.body);
+            const result = await newService.save();
+            return result
+        }
     }
 };
 
@@ -96,7 +102,7 @@ const getAllsubServicesByServiceId = async (req) => {
 };
 
 const getAllSubServicesByAdminId = async (req) => {
-    const adminId = req.admin.id;
+    const adminId = req.admin._id
     console.log("object :", adminId);
     const subServices = await subServiceModel.find({adminId: adminId});
     return subServices;
@@ -131,7 +137,7 @@ const deleteSubService = async (req) => {
 
 const getAllSubServicesByAdminIdForUser = async (req) => {
     const adminId = req.query.adminId;
-    console.log("object :", adminId);
+    console.log("AdminId :", adminId);
     const subServices = await subServiceModel.find({adminId: adminId}).populate({
         path: "serviceId",
         select: "Title text bannerImage"

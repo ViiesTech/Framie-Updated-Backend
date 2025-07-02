@@ -3,11 +3,20 @@ const clientProfileFunction = require("../functions/clientProfile");
 const createClientProfile = async (req, res) => {
     try {
         const clientProfile = await clientProfileFunction.createClientProfile(req);
-        return res.status(200).json({
+        if(clientProfile){
+                    return res.status(200).json({
             success: true,
             msg: "Client Profile Created!",
             data: clientProfile
         })
+        } else {
+                    return res.status(200).json({
+            success: true,
+            msg: "Client Profile Not Created!",
+            // data: clientProfile
+        })
+        }
+
     } catch (error) {
         console.log("Having Errors :", error);
         return res.status(403).json({

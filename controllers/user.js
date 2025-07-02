@@ -62,7 +62,7 @@ const signInByGoogle = async (req, res) => {
           { expiresIn: "1y" }
         );
         return res.status(200).json({
-          sucess: true,
+          success: true,
           msg: "User Logged In!",
           data: user,
           accessToken: token

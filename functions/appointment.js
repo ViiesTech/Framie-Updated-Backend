@@ -1,4 +1,5 @@
 const appointmentModel = require("../models/appointmentModel");
+const mongoose = require("mongoose");
 const moment = require("moment");
 
 const createAppointment = async (req) => {
@@ -21,11 +22,13 @@ const getAppointment = async (req) => {
 
 const updateStatus = async (req) => {
     const { appointmentId, status} = req.body;
-
     const appointment = await appointmentModel.findByIdAndUpdate({
         _id: appointmentId},
         {$set: {status: status}},
-        { new: true});
+        { new: true}).populate({
+          path: "services",
+          select: "title servicePoints"
+        });
     return appointment; 
 };
 
@@ -122,6 +125,120 @@ const getTotalCustomers = async (req) => {
 
 };
 
+const updateAppointment = async (req) => {
+  const { appointmentId, stylistId } = req.body;
+
+  const update = await appointmentModel.findByIdAndUpdate({_id: appointmentId},
+    { $set: {stylist: stylistId}},
+    { new: true }
+  );
+  return update
+};
+
+
+const getyearlyRevenue = async (req, res) => {
+  const { adminId } = req.query;
+
+  const monthlyRevenue = await appointmentModel.aggregate([
+    {
+      $match: {
+        adminId: new mongoose.Types.ObjectId(adminId)
+      }
+    },
+    {
+      $project: {
+        price: 1,
+        month: {
+          $month: {
+            $dateFromString: {
+              dateString: "$date",
+              format: "%d-%m-%Y"
+            }
+          }
+        },
+        year: {
+          $year: {
+            $dateFromString: {
+              dateString: "$date",
+              format: "%d-%m-%Y"
+            }
+          }
+        }
+      }
+    },
+    // First group: monthly totals
+    {
+      $group: {
+        _id: { year: "$year", month: "$month" },
+        totalRevenue: { $sum: "$price" },
+        appointmentsCount: { $sum: 1 }
+      }
+    },
+    {
+      $sort: {
+        "_id.year": -1,
+        "_id.month": -1
+      }
+    },
+    {
+      $project: {
+        year: "$_id.year",
+        month: "$_id.month",
+        totalRevenue: 1,
+        appointmentsCount: 1,
+        _id: 0
+      }
+    }
+  ]);
+
+  // Second aggregation for yearly totals
+  const yearlyRevenue = await appointmentModel.aggregate([
+    {
+      $match: {
+        adminId: new mongoose.Types.ObjectId(adminId)
+      }
+    },
+    {
+      $project: {
+        price: 1,
+        year: {
+          $year: {
+            $dateFromString: {
+              dateString: "$date",
+              format: "%d-%m-%Y"
+            }
+          }
+        }
+      }
+    },
+    {
+      $group: {
+        _id: "$year",
+        yearlyRevenue: { $sum: "$price" },
+        appointmentsCount: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { _id: -1 }
+    },
+    {
+      $project: {
+        year: "$_id",
+        yearlyRevenue: 1,
+        appointmentsCount: 1,
+        _id: 0
+      }
+    }
+  ]);
+
+  const data = {
+    monthlyRevenue,
+    yearlyRevenue
+  };
+  return data
+};
+
+
 module.exports = { 
     createAppointment,
     getAppointment,
@@ -132,5 +249,7 @@ module.exports = {
     getTotalClients,
     totalIncome,
     deleteAppointment,
-    getTotalCustomers
+    getTotalCustomers,
+    updateAppointment,
+    getyearlyRevenue
 };

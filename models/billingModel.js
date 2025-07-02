@@ -42,7 +42,7 @@ const billingSchema = new Schema ({
     },
     username:{
         type: String,
-        required: true
+        // required: true
     },
     differentAddress:{
         type: Boolean,

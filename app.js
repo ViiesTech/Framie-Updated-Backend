@@ -39,6 +39,7 @@ app.use(express.json());
 app.use("/api", require("./routes/admin"));
 app.use("/api", require("./routes/user"));
 app.use("/api", require("./routes/reviews"));
+
 const start = () => {
     try {
         connectDB();

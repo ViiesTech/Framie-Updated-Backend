@@ -1,7 +1,7 @@
 const employeeModel = require("../models/employee");
 
 const addEmployee = async (req) => {
-    console.log("data: ", req.body);
+    // console.log("data: ", req.body);
     const workingDays = JSON.parse(req.body.workingDays);
     const availableServices = JSON.parse(req.body.availableServices);
     const newEmployee = new employeeModel(req.body);
@@ -16,14 +16,19 @@ const getAllEmployeesByAdmin = async (req) => {
     const adminId = req.query.adminId;
     const allEmployees = await employeeModel.find({createdBy: adminId}).populate({
         path: "availableServices",
-        select: "Title"
+        select: "serviceId",
+        populate:{
+            path: "serviceId",
+            model: "Service",
+            select: "Title"
+        }
     });
     return allEmployees;
 };
 
 const getEmployee = async (req) => {
     const employeeId = req.query.employeeId; 
-    const employee = await employeeModel.findById({_id: employeeId});
+    const employee = await employeeModel.findById({_id: employeeId}).populate("availableServices");
     return employee
 };
 

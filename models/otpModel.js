@@ -4,7 +4,10 @@ const Schema = mongoose.Schema
 const optSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
-        required: true
+        // required: true
+    },
+    email:{
+        type: String
     },
     OTP: {
         type: String,

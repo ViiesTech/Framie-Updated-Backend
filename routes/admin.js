@@ -7,12 +7,15 @@ const businessProfileController = require("../controllers/businessProfile");
 const serviceController = require("../controllers/service");
 const employeeController = require("../controllers/employee");
 const appointmentController = require("../controllers/appointment");
+const royalityController = require("../controllers/royalityPoint");
 
 // Auth Routes
 router.post("/admin/signup", auth.UploadAdmin.single("AdminImage"), adminController.signup);
+router.post("/admin/verifyOTP", adminController.verifyOTP);
 router.post("/admin/login", adminController.login);
 router.post("/admin/updateAdmin",  auth.UploadAdmin.single("AdminImage"), adminController.updateProfile);
-auth.verifyAdmin,
+router.get("/admin/adminByadminId", adminController.adminProfile);
+// auth.verifyAdmin,
 // Billing Details Routes
 router.post("/admin/addBilling", adminController.addBillingDetails);
 router.get("/admin/getBilling", auth.verifyAdmin, adminController.getBillingDetails);
@@ -54,12 +57,27 @@ router.post("/admin/deleteEmployee", employeeController.deleteEmployee);
 router.post("/admin/addAppointment", appointmentController.createAppointment);
 router.get("/admin/getAppointmentByAdmin", appointmentController.getAppointmentbyAdmin);
 router.get("/admin/getAppointment", appointmentController.getAppointment);
-router.post("/admin/updateAppointment", appointmentController.updateStatus);
+router.post("/admin/updateAppointmentStatus", appointmentController.updateStatus);
+router.post("/admin/updateAppointment", appointmentController.updateAppointment);
 router.get("/admin/getCustomers", appointmentController.getCustomers);
 router.get("/admin/appointmentByStylist",appointmentController.getAppointmentByStylists);
 router.get("/admin/getTotalCustomers", appointmentController.getTotalCustomers);
 
+
 // Appointments By User
 router.get("/user/getAppointmentsByUser", appointmentController.getAppointmentbyUser);
 router.post("/user/deleteAppointment", appointmentController.deleteAppointment);
+
+router.get("/admin/yearlyRevenue", appointmentController.getRevenue);
+
+//Royality Point Routes
+// router.get("/admin/getRoyalityProfiles", royalityController.getAllRoyalityProfilesByAdmin);
+// router.get("/admin/totalRoyalityPoints", royalityController.getTotalRoyalityPointsByAdmin);
+// router.get("/admin/royalityDashboard", royalityController.dashoboard);
+// router.get("/admin/totalServices", royalityController.totalServicePoints);
+// router.post("/admin/deleteRoyality", royalityController.pauseRoyality);
+
+// router.post("/admin/addBusinessPoints", royalityController.updateBusinessRoyalitypoints);
+// router.post("/admin/addSubservicePoints", royalityController.updateSubservicePoints);
+
 module.exports = router
