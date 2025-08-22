@@ -5,9 +5,10 @@ const auth = require("../middleware/auth");
 const adminController = require("../controllers/admin");
 const businessProfileController = require("../controllers/businessProfile");
 const serviceController = require("../controllers/service");
-const employeeController = require("../controllers/employee");
+const stylistController = require("../controllers/stylist");
 const appointmentController = require("../controllers/appointment");
 const royalityController = require("../controllers/royalityPoint");
+const walkinController = require("../controllers/walkinCustomer");
 
 // Auth Routes
 router.post("/admin/signup", auth.UploadAdmin.single("AdminImage"), adminController.signup);
@@ -29,55 +30,48 @@ router.get("/admin/allBusinessProfiles", auth.verifyUser, businessProfileControl
 
 // Services Routes
 router.post("/admin/addService", auth.verifyAdmin, auth.UploadService.single("ServiceImage"),serviceController.addService);
-router.get("/admin/getAllServices", auth.verifyAdmin, serviceController.getAllservicesByAdminId);
-router.get("/admin/getAllServicesByAdminId", serviceController.getAllservicesByAdmin);
+router.get("/admin/getAllServicesByAdminId", auth.verifyAdmin, serviceController.getAllservicesByAdminId);
+router.get("/admin/getAllServices", serviceController.getAllservices);
 router.post("/admin/deleteService", serviceController.deleteService);
 
 // Subservices Routes
 router.post("/admin/addSubService", auth.UploadSubService.array("subServiceImages", 3), serviceController.addSubService);
 router.post("/admin/EditSubService",auth.UploadSubService.array("subServiceImages", 3), serviceController.updatedSubService);
-router.get("/admin/getSubServicesByServiceId", serviceController.getAllsubServicesByServiceId);
 router.get("/admin/getSubServicesByAdminId", auth.verifyAdmin, serviceController.getAllSubServicesByAdminId);
-router.get("/admin/getSubServicesByAdmin", serviceController.getAllSubServicesByAdmin);
+router.get("/admin/getAllSubServices", serviceController.getAllSubServices);
 router.get("/admin/getSubserviceById", serviceController.getSubService);
 router.post("/admin/deleteSubservice", serviceController.deleteSubService);
-// router.post("/admin/assignEmployee", serviceController.assignEmployee);
+// router.post("/admin/assignStylist", serviceController.assignStylist);
 
-// User SubServices Route
-router.get("/user/getSubServicesByAdminId", serviceController.getAllSubServicesForUser);
-
-// Employee Routes
-router.post("/admin/addEmployee", auth.UploadEmployee.single("EmployeeImage"), employeeController.addEmployee);
-router.get("/admin/getAllEmployees", employeeController.getAllEmployeesByAdmin);
-router.get("/admin/getEmployee", employeeController.getEmployee);
-router.post("/admin/updateEmployee", auth.verifyAdmin, auth.UploadEmployee.single("EmployeeImage"), employeeController.updateEmployee);
-router.post("/admin/deleteEmployee", employeeController.deleteEmployee);
+// Stylist Routes
+router.post("/admin/addStylist", auth.UploadEmployee.single("stylistImage"), stylistController.addStylist);
+router.post("/admin/stylistLogin", stylistController.login);
+router.get("/admin/getAllStylists", stylistController.getAllStylistsByAdmin);
+router.get("/admin/getStylistProfile", stylistController.getStylistProfile);
+router.post("/admin/updateStylist", auth.verifyAdmin, auth.UploadEmployee.single("stylistImage"), stylistController.updateStylist);
+router.post("/admin/deleteStylist", stylistController.deleteStylist);
 
 //Appointment Routes for Admin
 router.post("/admin/addAppointment", appointmentController.createAppointment);
-router.get("/admin/getAppointmentByAdmin", appointmentController.getAppointmentbyAdmin);
 router.get("/admin/getAppointment", appointmentController.getAppointment);
+router.get("/admin/getAllAppointments",appointmentController.getAllAppointments);
 router.post("/admin/updateAppointmentStatus", appointmentController.updateStatus);
 router.post("/admin/updateAppointment", appointmentController.updateAppointment);
 router.get("/admin/getCustomers", appointmentController.getCustomers);
-router.get("/admin/appointmentByStylist",appointmentController.getAppointmentByStylists);
 router.get("/admin/getTotalCustomers", appointmentController.getTotalCustomers);
-
 
 // Appointments By User
 router.get("/user/getAppointmentsByUser", appointmentController.getAppointmentbyUser);
 router.post("/user/deleteAppointment", appointmentController.deleteAppointment);
 
+// Revenue By AdminId
 router.get("/admin/yearlyRevenue", appointmentController.getRevenue);
 
-//Royality Point Routes
-// router.get("/admin/getRoyalityProfiles", royalityController.getAllRoyalityProfilesByAdmin);
-// router.get("/admin/totalRoyalityPoints", royalityController.getTotalRoyalityPointsByAdmin);
-// router.get("/admin/royalityDashboard", royalityController.dashoboard);
-// router.get("/admin/totalServices", royalityController.totalServicePoints);
-// router.post("/admin/deleteRoyality", royalityController.pauseRoyality);
-
-// router.post("/admin/addBusinessPoints", royalityController.updateBusinessRoyalitypoints);
-// router.post("/admin/addSubservicePoints", royalityController.updateSubservicePoints);
+// Walk-In Customer's Route 
+router.post("/admin/createWalkin", walkinController.createWalkin);
+router.get("/admin/getWalkinById", walkinController.getWalkinById);
+router.get("/admin/getAllWalkins", walkinController.getAllwalkins);
+router.post("/admin/updateWalkin", walkinController.updatewalkinById);
+router.post("/admin/deleteWalkin", walkinController.deleteWalkinById);
 
 module.exports = router

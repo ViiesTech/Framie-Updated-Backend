@@ -1,11 +1,13 @@
+const stylistModel = require("../models/stylist");
 const serviceModel = require("../models/services");
 const subServiceModel = require("../models/subServices");
+const { options } = require("../routes/admin");
 
 // Add Services
 const addService = async (req) => {
     console.log("Path :", req.file.path)
     let { adminId, Title } = req.body; 
-    const exist = await serviceModel.findOne({adminId: adminId, Title: Title});
+    const exist = await serviceModel.findOne({adminId: adminId,  Title: Title});
     if(exist){
         // console.log("Exist", exist)
         return {data:exist, exist:true};
@@ -44,14 +46,21 @@ const updatedService = async (req) => {
 
 const getAllservicesByAdminId = async (req) => {
     const adminId = req.admin.id;
-    const allServices = await serviceModel.find({adminId: adminId});
+    const allServices = await serviceModel.find({adminId: adminId}).populate("categoryId");
     return allServices;
 };
 
-const getAllservicesByAdmin = async (req) => {
-    const {adminId} = req.query;
-    console.log("object: ", adminId);
-    const allServices = await serviceModel.find({adminId: adminId});
+const getAllservices = async (req) => {
+    const { adminId, categoryId } = req.query;
+    // console.log("object: ", adminId);
+    const filter = {};
+    if(adminId){
+        filter.adminId = adminId;
+    };
+    if(categoryId){
+        filter.categoryId = categoryId;
+    };
+    const allServices = await serviceModel.find(filter).populate("categoryId")
     return allServices;
 };
 
@@ -95,16 +104,9 @@ const updatedSubService = async (req) => {
     }
 };
 
-const getAllsubServicesByServiceId = async (req) => {
-    const serviceId = req.query;
-    const subServices = await subServiceModel.find(serviceId).populate("assignedTo");
-    return subServices
-};
-
 const getAllSubServicesByAdminId = async (req) => {
     const adminId = req.admin._id
-    console.log("object :", adminId);
-    const subServices = await subServiceModel.find({adminId: adminId});
+    const subServices = await subServiceModel.find({adminId: adminId}).populate("categoryId").populate("serviceId");
     return subServices;
 };
 
@@ -114,19 +116,49 @@ const getSubServiceById = async (req) => {
     return subService;
 };
 
-const getAllSubServicesByAdmin = async (req) => {
-    const {adminId} = req.query;
-    console.log("I'd :", adminId);
-    const subServices = await subServiceModel.find({adminId: adminId});
+const getAllSubServices = async (req) => {
+    const { adminId, categoryId, serviceId, stylistId } = req.query;
+    const filter = {};
+    if(adminId){
+        filter.adminId = adminId;
+    };
+    if(categoryId){
+        filter.categoryId = categoryId;
+    }
+    if(serviceId){
+        filter.serviceId = serviceId;
+    };
+    if(stylistId){
+        filter.assignedTo = { $in: [stylistId] };
+    }
+    const subServices = await subServiceModel.find(filter);
     return subServices;
 };
 
-const assignEmployeeToService = async (req) =>{
-    const { subServiceId, employeeId } = req.query;
-    const assign = await subServiceModel.findByIdAndUpdate({_id: subServiceId},
-        { $addToSet: {assignedTo: employeeId}},
-        { new: true});
-    return assign; 
+const assignStylistToService = async (req) =>{
+    const { subServiceId, stylistId } = req.query;
+    const subService = await subServiceModel.findById(subServiceId);
+    if(subService.assignedTo.includes(stylistId)){
+        const unAssign = await subServiceModel.findByIdAndUpdate(subServiceId,
+            { $pull: { assignedTo: stylistId}},
+            { new: true }
+        );
+        const stylist = await stylistModel.findByIdAndUpdate(stylistId, 
+            { $pull: { availableServices: subServiceId }},
+            { new: true }
+        );
+        return unAssign
+    } else {
+        const assign = await subServiceModel.findByIdAndUpdate({_id: subServiceId},
+            { $push: {assignedTo: stylistId}},
+            { new: true}
+        );
+        const stylist = await stylistModel.findByIdAndUpdate(stylistId, 
+            { $push: { availableServices: subServiceId } },
+            { new: true }
+        );
+        return assign;
+    }
 };
 
 const deleteSubService = async (req) => {
@@ -135,28 +167,29 @@ const deleteSubService = async (req) => {
     return result;
 };
 
-const getAllSubServicesByAdminIdForUser = async (req) => {
-    const adminId = req.query.adminId;
-    console.log("AdminId :", adminId);
-    const subServices = await subServiceModel.find({adminId: adminId}).populate({
-        path: "serviceId",
-        select: "Title text bannerImage"
-    });
-    return subServices;
-};
+// const getAllSubServicesByAdminIdForUser = async (req) => {
+//     const adminId = req.query.adminId;
+//     console.log("AdminId :", adminId);
+//     const subServices = await subServiceModel.find({adminId: adminId}).populate({
+//         path: "serviceId",
+//         select: "Title text bannerImage"
+//     });
+//     return subServices;
+// };
 
 module.exports = {
     addService,
     getAllservicesByAdminId,
-    getAllservicesByAdmin,
+    getAllservices,
+    updatedService,
     deleteServices,
     addSubService,
-    updatedSubService,
-    getAllsubServicesByServiceId,
-    getAllSubServicesByAdminId,
     getSubServiceById,
-    getAllSubServicesByAdmin,
-    assignEmployeeToService,
+    // getAllsubServicesByServiceId,
+    getAllSubServicesByAdminId,
+    getAllSubServices,
+    updatedSubService,
+    assignStylistToService,
     deleteSubService,
-    getAllSubServicesByAdminIdForUser
+    // getAllSubServicesByAdminIdForUser
 };

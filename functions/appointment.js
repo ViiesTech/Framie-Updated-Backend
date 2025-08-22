@@ -38,40 +38,59 @@ const getAppointmentbyUser = async (req) => {
     return appointment
 };
 
-const getAppointmentbyAdmin = async (req) => {
-    const {adminId, status} = req.query;
-    console.log("object :", adminId);
-    if(status === "All" || status === "all"){
-      const appointment = await appointmentModel.find({
-        adminId: adminId
-      });
-      return appointment;
-    } else {
-      const appointment = await appointmentModel.find({
-        adminId: adminId,
-        status: status
-      });
-      return appointment;
-    }
-    
+const getAllAppointments = async (req) => {
+  const { adminId, stylistId, status } = req.query;
+
+  const filter = {};
+  if(adminId){
+    filter.adminId = adminId
+  };
+  if(stylistId){
+    filter.stylist = stylistId
+  };
+  if(status){
+    filter.status = status
+  };
+
+  const appointments = await appointmentModel.find(filter);
+  return appointments;
 };
 
-const getAppointmentsByStylists = async (req) => {
-  const { adminId, employeeId } = req.query;
-  if(!employeeId){
-    const appointments = await appointmentModel.find({
-      adminId: adminId
-    });
-    console.log("first :")
-    return appointments
-  } else {
-    const appointments = await appointmentModel.find({
-      adminId: adminId,
-      stylist: employeeId
-    });
-    console.log("Second :")
-    return appointments
-  }
+const availableSlot = async (req) => {
+  const { stylistId, date, timeSlot } = req.body;
+  
+  const filter = {};
+  if(stylistId){
+    filter.stylist = stylistId
+  };
+
+  if(date){
+    filter.date = date
+  };
+
+  if(timeSlot){
+    filter.timeSlot = timeSlot
+  };
+
+  const appointments = await appointmentModel.find(filter);
+  return appointments
+
+}
+
+const updateAppointment = async (req) => {
+  const { appointmentId, stylistId } = req.body;
+
+  const update = await appointmentModel.findByIdAndUpdate({_id: appointmentId},
+    { $set: {stylist: stylistId}},
+    { new: true }
+  );
+  return update
+};
+
+const deleteAppointment = async (req) => {
+    const { appointmentId } = req.query;
+    const result = await appointmentModel.findByIdAndDelete({_id: appointmentId});
+    return result 
 };
 
 const getTotalClients = async (req) => {
@@ -89,12 +108,6 @@ const totalIncome = async (req) => {
 
   const totalIncome = income.reduce((sum, appointment) => sum + (appointment.price || 0), 0);
   return totalIncome;
-};
-
-const deleteAppointment = async (req) => {
-    const { appointmentId } = req.query;
-    const result = await appointmentModel.findByIdAndDelete({_id: appointmentId});
-    return result 
 };
 
 const getTotalCustomers = async (req) => {
@@ -124,17 +137,6 @@ const getTotalCustomers = async (req) => {
   return total;
 
 };
-
-const updateAppointment = async (req) => {
-  const { appointmentId, stylistId } = req.body;
-
-  const update = await appointmentModel.findByIdAndUpdate({_id: appointmentId},
-    { $set: {stylist: stylistId}},
-    { new: true }
-  );
-  return update
-};
-
 
 const getyearlyRevenue = async (req, res) => {
   const { adminId } = req.query;
@@ -242,10 +244,10 @@ const getyearlyRevenue = async (req, res) => {
 module.exports = { 
     createAppointment,
     getAppointment,
+    availableSlot,
     updateStatus,
     getAppointmentbyUser,
-    getAppointmentbyAdmin,
-    getAppointmentsByStylists,
+    getAllAppointments,
     getTotalClients,
     totalIncome,
     deleteAppointment,

@@ -29,11 +29,18 @@ const addService = async (req, res) => {
 const getAllservicesByAdminId = async (req, res) => {
     try {
         const allServices = await serviceFunctions.getAllservicesByAdminId(req);
-        return res.status(200).json({
-            success: true,
-            msg: "All Services By Admin",
-            data: allServices
-        })
+        if(allServices.length === 0){
+            return res.status(200).json({
+                success: false,
+                msg: "No Services Found By Admin!"
+            });            
+        } else {
+            return res.status(200).json({
+                success: true,
+                msg: "All Services By Admin",
+                data: allServices
+            })
+        }
     } catch (error) {
         console.log("Having Errors: ", error);
         return res.status(403).json({
@@ -44,9 +51,9 @@ const getAllservicesByAdminId = async (req, res) => {
     }
 };
 
-const getAllservicesByAdmin = async (req, res) => {
+const getAllservices = async (req, res) => {
     try {
-        const allServices = await serviceFunctions.getAllservicesByAdmin(req);
+        const allServices = await serviceFunctions.getAllservices(req);
         if(allServices.length === 0){
             return res.status(403).json({
                 success: false,
@@ -124,23 +131,23 @@ const updatedSubService = async (req, res) => {
     }
 }
 
-const getAllsubServicesByServiceId = async (req, res) => {
-    try {
-        const allSubServices = await serviceFunctions.getAllsubServicesByServiceId(req);
-        return res.status(200).json({
-            success: true,
-            msg: "All Subservices By Service Id",
-            data: allSubServices
-        })
-    } catch (error) {
-        console.log("Having Errors: ", error);
-        return res.status(403).json({
-            success: false,
-            msg: "Having Errors",
-            error: error.message
-        })
-    }
-};
+// const getAllsubServicesByServiceId = async (req, res) => {
+//     try {
+//         const allSubServices = await serviceFunctions.getAllsubServicesByServiceId(req);
+//         return res.status(200).json({
+//             success: true,
+//             msg: "All Subservices By Service Id",
+//             data: allSubServices
+//         })
+//     } catch (error) {
+//         console.log("Having Errors: ", error);
+//         return res.status(403).json({
+//             success: false,
+//             msg: "Having Errors",
+//             error: error.message
+//         })
+//     }
+// };
 
 const getAllSubServicesByAdminId = async (req, res) => {
     try {
@@ -178,9 +185,9 @@ const getSubService = async (req, res) => {
     }
 };
 
-const getAllSubServicesByAdmin = async (req, res) => {
+const getAllSubServices = async (req, res) => {
     try {
-        const allServices = await serviceFunctions.getAllSubServicesByAdmin(req);
+        const allServices = await serviceFunctions.getAllSubServices(req);
         if(allServices.length === 0){
             return res.status(200).json({
                 sucess: true,
@@ -238,36 +245,36 @@ const deleteSubService = async (req, res) => {
     }
 };
 
-const getAllSubServicesForUser = async (req, res) => {
-    try {
-        const Subservices = await serviceFunctions.getAllSubServicesByAdminIdForUser(req);
-        return res.status(200).json({
-            success: true,
-            msg: "All Subservices By Admin Id",
-            data: Subservices
-        })
-    } catch (error) {
-        console.log("Having Errors: ", error);
-        return res.status(403).json({
-            success: false,
-            msg: "Having Errors",
-            error: error.message
-        })
-    }
-};
+// const getAllSubServicesForUser = async (req, res) => {
+//     try {
+//         const Subservices = await serviceFunctions.getAllSubServicesByAdminIdForUser(req);
+//         return res.status(200).json({
+//             success: true,
+//             msg: "All Subservices By Admin Id",
+//             data: Subservices
+//         })
+//     } catch (error) {
+//         console.log("Having Errors: ", error);
+//         return res.status(403).json({
+//             success: false,
+//             msg: "Having Errors",
+//             error: error.message
+//         })
+//     }
+// };
 
 module.exports = {
     addService,
     getAllservicesByAdminId,
-    getAllservicesByAdmin,
+    getAllservices,
     deleteService,
     addSubService,
     updatedSubService,
-    getAllsubServicesByServiceId,
+    // getAllsubServicesByServiceId,
     getAllSubServicesByAdminId,
     getSubService,
-    getAllSubServicesByAdmin,
+    getAllSubServices,
     assignEmployee,
     deleteSubService,
-    getAllSubServicesForUser
+    // getAllSubServicesForUser,
 };

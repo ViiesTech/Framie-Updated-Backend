@@ -2,20 +2,25 @@ const adminModel = require("../models/AdminModel");
 const businessModel = require("../models/businessProfile");
 
 const addBusinessProfile = async (req) => {
-    const services = JSON.parse(req.body.availableServices);
+    const categories = JSON.parse(req.body.categories);
     const workingDays = JSON.parse(req.body.workingDays); 
-
+    const location = {
+            type: "Point",
+            coordinates: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)],
+            locationName: req.body.locationName || null
+        };
     const newBusiness = new businessModel(req.body);
-    newBusiness.availableServices = services;
+    newBusiness.categories = categories;
     newBusiness.workingDays = workingDays;
     newBusiness.profileImage = req.file.filename;
+    newBusiness.location = location
     const result = await newBusiness.save();
     return result;
 };
 
 const getBusinessProfile = async (req) => {
     const adminId = req.admin.id;
-    const businessProfile = await businessModel.findOne({adminId: adminId});
+    const businessProfile = await businessModel.findOne({adminId: adminId}).populate("categories");
     return businessProfile;
 };
 

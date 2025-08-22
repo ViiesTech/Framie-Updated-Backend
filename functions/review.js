@@ -43,15 +43,15 @@ const getReviewsByType = async (req) => {
         }
     } else {
         if(stars){
-            const { stars, employeeId } = req.query;
-            const review = await reviewModel.find({type: type, onStylist: employeeId, stars: stars}).populate({
+            const { stars, stylistId } = req.query;
+            const review = await reviewModel.find({type: type, onStylist: stylistId, stars: stars}).populate({
                 path: "reviewBy",
                 select: "-password"
             }).populate("onStylist");
             return review;
         } else {
-            const { employeeId } = req.query;
-            const review = await reviewModel.find({type: type, onStylist: employeeId}).populate({
+            const { stylistId } = req.query;
+            const review = await reviewModel.find({type: type, onStylist: stylistId}).populate({
                 path: "reviewBy",
                 select: "-password"
             }).populate("onStylist");
@@ -75,7 +75,7 @@ const getAllReviewsByAdmin = async (req) => {
         }
     }).populate({
         path: "onStylist",
-        select: "employeeName"
+        select: "stylistName"
     })
     return result;
 };

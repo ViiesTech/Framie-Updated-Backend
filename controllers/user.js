@@ -212,10 +212,12 @@ const verifyOTP = async (req, res) => {
         { expiresIn: "2 days" }
       );
       if (user.isVerified === true) {
+          req.body.userId = user._id ;
+        const userData = await userFunction.getProfile(req);
         return res.status(200).json({
           success: true,
           msg: "User is Successfully Verified!",
-          data: user,
+          data: userData,
           accessToken: token,
         });
       } else {

@@ -18,7 +18,7 @@ const clientProfileSchema = new Schema({
     }],
     stylists:[{
         type: Schema.Types.ObjectId,
-        ref: "Employee",
+        ref: "Stylist",
     }],
     notes: [{
         text: { type: String },

@@ -24,26 +24,23 @@ const getUser = async (req) => {
     return admin; 
 };
 
+const adminById = async (adminId) => {
+    const admin = await adminModel.findById(adminId).select("-password");
+    return admin;
+}
+
 const updateProfile = async (req) => {
     // const userId = req.admin._id;
-    const { id } = req.body
+    const { adminId } = req.body
+    const updatedData = req.body;
     if(req.file && req.file.filename){
-        const imagePath = req.file.filename;
-        console.log("first :", imagePath);
-        const updatedData = req.body;
-        const updatedAdmin = await adminModel.findByIdAndUpdate({_id: id}, 
-            {$set: updatedData, profileImage:imagePath }, 
-            { new: true }).select("-password");
-        return updatedAdmin;
-    } else {
-        const updatedData = req.body;
-        console.log("Updated Data: ", updatedData);
-        const updatedAdmin = await adminModel.findByIdAndUpdate({_id: id}, 
-            {$set: updatedData }, 
-            { new: true }).select("-password");
-        return updatedAdmin;
+        updatedData.profileImage = req.file.filename
     }
-
+    const admin = await adminModel.findByIdAndUpdate(adminId,
+        { $set: updatedData },
+        { new: true }
+    ).select("-password");
+    return admin;
 };
 
 // Admin Billing Functions
@@ -106,6 +103,7 @@ const getAdminByAdminId = async (req) => {
 module.exports = { 
     signUp,
     getUser,
+    adminById,
     updateProfile,
     addBillingDetails,
     findBilling,

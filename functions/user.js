@@ -57,12 +57,14 @@ const verifyUser = async (userId) => {
 };
 
 const getUser = async (req) => {
+
     const user = await userModel.findOne({email: req.body.email});
     return user;
 };
 
 const getProfile = async (req) => {
-    const userId = req.user.id;
+
+    let userId = req.body.userId || req.user?.id;
     const user = await userModel.findById({_id: userId}).select("-password");
     return user
 };

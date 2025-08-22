@@ -22,7 +22,7 @@ const appReviewSchema = new Schema({
     },
     onStylist:{
         type: Schema.Types.ObjectId,
-        ref: "Employee"
+        ref: "Stylist"
     },
     stars:{
         type: Number,

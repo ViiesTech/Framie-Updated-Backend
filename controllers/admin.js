@@ -94,6 +94,7 @@ const signup = async (req, res) => {
 const verifyOTP = async (req, res) => {
     try {
         const verify = await otpFunction.verifyOTP(req);
+        console.log("first :", verify);
         if(verify){
             const { signupToken } = req.body;
             const decode = jwt.verify(signupToken, process.env.SECRET_KEY);
@@ -153,6 +154,8 @@ const login = async (req, res) => {
                     msg: "Inavlid Password!"
                 })
             } else {
+                const adminId = admin._id;
+                const adminData = await adminFunction.adminById(adminId)
                 let token = jwt.sign({
                     id: admin._id,
                     email: admin.email,
@@ -164,16 +167,8 @@ const login = async (req, res) => {
                 return res.status(200).json({
                     sucess: true,
                     msg: "Admin Logged In Successfully!",
-                    data: {
-                        _id: admin._id,
-                        email: admin.email,
-                        city: admin.city,
-                        phNumber: admin.phNumber,
-                        name: admin.firstName+" "+admin.lastName,
-                        profileImage: admin.profileImage,
-                        businessProfile: admin.businessProfile,
-                        billingDetails: admin.billingDetails
-                    }, aceessToken: token
+                    data: adminData,
+                    aceessToken: token
                 })
             } 
         }

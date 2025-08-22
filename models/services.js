@@ -7,6 +7,11 @@ const serviceSchema = new Schema({
         ref: "Admin",
         required: true
     },
+    categoryId:{
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+        required: true
+    },
     Title: {
         type: String,
         enum:["Hair Services", "Skin Services", "Nail Services", "Others Services"],

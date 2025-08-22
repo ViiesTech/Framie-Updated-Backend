@@ -7,6 +7,11 @@ const subServiceSchema = new Schema({
         ref:"Admin",
         required: true,
     },
+    categoryId: {
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+        required: true
+    },
     serviceId: {
         type: Schema.Types.ObjectId,
         ref: "Service",
@@ -14,7 +19,7 @@ const subServiceSchema = new Schema({
     },
     assignedTo: [{
         type: Schema.Types.ObjectId,
-        ref:"Employee",
+        ref:"Stylist",
     }],
     title: {
         type: String,

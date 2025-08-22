@@ -41,11 +41,20 @@ const transporter = nodemailer.createTransport({
 const sendOTP = async (userData) => {
     try {
         let mailOptions = {
-            from: process.env,
+            from: process.env.appEmail,
             to: userData.email,
             subject: "Your OTP Code",
-            // text: `Your OTP CODE is ${userData.otp}`
-            html: `<h2> Your OTP Code: <strong>${userData.OTP}</strong></h2>`
+            html: `
+              <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                <h2>Welcome to Framie!</h2>
+                <p>Your One-Time  (OTP) is:</p>
+                <h1 style="color: #A83F98;">${userData.OTP}</h1>
+                <p>Please enter this code in the app to verify your account.</p>
+                <p><strong>Note:</strong>  Do not share it with anyone.</p>
+                <br/>
+                <p>Thank you,<br/> Team Framie </p>
+              </div>
+            `,
         };
 
         let info = await transporter.sendMail(mailOptions);

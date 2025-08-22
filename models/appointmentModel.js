@@ -20,6 +20,10 @@ const appointmointSchema = new Schema({
         type: String,
         required: true,
     },
+    categoryId: {
+        type: Schema.Types.ObjectId,
+        ref: "Category"
+    },
     services:[{
         type: Schema.Types.ObjectId,
         ref: "Subservice",
@@ -27,7 +31,11 @@ const appointmointSchema = new Schema({
     }],
     stylist:{
         type: Schema.Types.ObjectId,
-        ref: "Employee",
+        ref: "Stylist",
+    },
+    previousStylist:{
+        type: Schema.Types.ObjectId,
+        ref: "Stylist"
     },
     timeSlot:{
         type: String,
@@ -40,21 +48,31 @@ const appointmointSchema = new Schema({
         type: Number,
         required: true
     },
-    createdByModel: {
-        type: String,
-        required: true,
-        enum:["User", "Admin"]
-    },
-    createdBy:{
-        type: Schema.Types.ObjectId,
-        refPath:"createdByModel",
-        required: true,
-    },
+    // createdByModel: {
+    //     type: String,
+    //     required: true,
+    //     enum:["User", "Admin"]
+    // },
+    // createdBy:{
+    //     type: Schema.Types.ObjectId,
+    //     refPath:"createdByModel",
+    //     required: true,
+    // },
     status: {
         type: String,
-        enum:["Pending", "Accepted", "Completed"],
+        enum:["Pending", "Accepted", "Completed", "Cancelled", "Rescheduled"],
         default: "Pending"
-    }
+    },
+    cancelledByModel: {
+        type: String,
+        required: true,
+        enum:["User", "Stylist"]
+    },
+    cancelledBy:{
+        type: Schema.Types.ObjectId,
+        refPath:"cancelledByModel",
+        required: true,
+    },
 }, { timestamps: true })
 
 const appointmointModel = mongoose.model("Appointment", appointmointSchema)

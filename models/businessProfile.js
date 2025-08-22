@@ -27,11 +27,11 @@ const businessSchema = new Schema({
         type: String,
         required: true
     },
-    availableServices:{
-        type: [String],
-        enum:["Hair Services", "Skin Services", "Nail Services", "Others Services"],
-        required: true
-    },
+    categories:[{
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+        requried: true
+    }],
     workingDays:[{
         day:{
             type: String,

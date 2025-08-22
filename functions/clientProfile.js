@@ -39,8 +39,8 @@ const getClientProfile = async (req) => {
         },
         {
             path: "stylist",
-            model: "Employee",
-            select: "employeeName employeeImage about"
+            model: "Stylist",
+            select: "stylistName stylistImage about"
         }]
     }).populate("stylists");
 
@@ -62,10 +62,10 @@ const updateNotes = async (req) => {
     return result;
 };
 
-const addEmployee = async (req, res) => {
-    const { userId, employeeId } = req.query;
+const addStylist = async (req, res) => {
+    const { userId, stylistId } = req.query;
     const result = await clientProfileModel.findOneAndUpdate({userId: userId},
-        {$push: { stylists: employeeId}},
+        {$push: { stylists: stylistId}},
         { new: true }
     );
     return result;
@@ -84,6 +84,6 @@ module.exports= {
     createClientProfile,
     getClientProfile,
     updateNotes,
-    addEmployee,
+    addStylist,
     getAllClients
 };

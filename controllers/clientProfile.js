@@ -63,12 +63,12 @@ const updateNotes = async (req, res) => {
     }
 };
 
-const addEmployee = async (req, res) => {
+const addStylist = async (req, res) => {
     try {
-        const updated = await clientProfileFunction.addEmployee(req);
+        const updated = await clientProfileFunction.addStylist(req);
         return res.status(200).json({
             success: true,
-            msg: "Employee Added Successfully!",
+            msg: "Stylist Added Successfully!",
             data: updated
         })
     } catch (error) {
@@ -103,6 +103,6 @@ module.exports = {
     createClientProfile,
     getClientProfile,
     updateNotes,
-    addEmployee,
+    addStylist,
     getAllClients
 };

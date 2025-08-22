@@ -94,34 +94,9 @@ const getAppointmentbyUser = async (req, res) => {
     }
 };
 
-const getAppointmentbyAdmin = async (req, res) => {
+const getAllAppointments = async (req, res) => {
     try {
-        const appointments = await appointmentFunction.getAppointmentbyAdmin(req);
-        if(appointments.length === 0){
-            return res.status(200).json({
-                success: false,
-                msg: "No Appointments Found For This Admin!",
-            })
-        } else {
-            return res.status(200).json({
-                success: true,
-                msg: "All Appointments created By Admin!",
-                data: appointments
-            })
-        }
-    } catch (error) {
-        console.log("Having Errors: ", error);
-        return res.status(403).json({
-            success: false,
-            msg: "Having Errors!",
-            error
-        })
-    }
-};
-
-const getAppointmentByStylists = async (req, res) => {
-    try {
-        const appointments = await appointmentFunction.getAppointmentsByStylists(req);
+        const appointments = await appointmentFunction.getAllAppointments(req);
         return res.status(200).json({
             success: true,
             msg: "All Appointments by Stylist!",
@@ -235,8 +210,7 @@ module.exports = {
     getAppointment,
     updateStatus,
     getAppointmentbyUser,
-    getAppointmentbyAdmin,
-    getAppointmentByStylists,
+    getAllAppointments,
     getCustomers,
     deleteAppointment,
     getTotalCustomers,

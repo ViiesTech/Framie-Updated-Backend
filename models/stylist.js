@@ -1,13 +1,26 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const employeeSchema = new Schema({
+const stylistSchema = new Schema({
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: "Admin",
         required: true,
     },
-    employeeName: {
+    salonId:{
+        type: Schema.Types.ObjectId,
+        ref:"BusinessProfile",
+        required: true
+    },
+    email:{
+        type: String,
+        requied: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    stylistName: {
         type: String,
         required: true,
     },
@@ -15,7 +28,7 @@ const employeeSchema = new Schema({
         type: String,
         required: true,
     },
-    employeeImage: {
+    stylistImage: {
         type: String,
         required: true,
     },
@@ -41,9 +54,8 @@ const employeeSchema = new Schema({
     availableServices: [{
         type: Schema.Types.ObjectId,
         ref: "Subservice",
-        // required: true,
     }]
 });
 
-const employeeModel = mongoose.model("Employee", employeeSchema);
-module.exports = employeeModel;
+const stylistModel = mongoose.model("Stylist", stylistSchema);
+module.exports = stylistModel;
