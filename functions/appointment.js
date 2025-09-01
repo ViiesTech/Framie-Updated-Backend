@@ -1,6 +1,8 @@
 const appointmentModel = require("../models/appointmentModel");
+const subServiceModel = require("../models/subServices");
 const mongoose = require("mongoose");
 const moment = require("moment");
+const stylistModel = require("../models/stylist");
 
 const createAppointment = async (req) => {
   if(req.body.createdByModel === "Admin"){
@@ -18,18 +20,6 @@ const getAppointment = async (req) => {
     const appointmentId = req.query.appointmentId;
     const appointment = await appointmentModel.findById({_id: appointmentId});
     return appointment;
-};
-
-const updateStatus = async (req) => {
-    const { appointmentId, status} = req.body;
-    const appointment = await appointmentModel.findByIdAndUpdate({
-        _id: appointmentId},
-        {$set: {status: status}},
-        { new: true}).populate({
-          path: "services",
-          select: "title servicePoints"
-        });
-    return appointment; 
 };
 
 const getAppointmentbyUser = async (req) => {
@@ -56,10 +46,59 @@ const getAllAppointments = async (req) => {
   return appointments;
 };
 
-const availableSlot = async (req) => {
-  const { stylistId, date, timeSlot } = req.body;
+const availableStylist = async (req) => {
+  const { serviceId, date, timeSlot } = req.query;
+
+  const service = await subServiceModel.findById({_id: serviceId});
+
+  const appointments = await appointmentModel.distinct("stylist", {
+    services: new mongoose.Types.ObjectId(serviceId),
+    date,
+    timeSlot: {$regex: `^${timeSlot}$`, $options: "i"},
+    status: { $in: ["Accepted", "Rescheduled"] }
+  });
+  const availableStylistIds = service.assignedTo.filter(
+  stylistId => !appointments.map(String).includes(String(stylistId))
+  );
+
+  const availableStylists = await stylistModel.find({
+      _id: { $in: availableStylistIds }
+    }).select("email stylistName about stylistImage");
+
+  return availableStylists
+
+};
+
+const alreadyBooked = async (req) => {
+  const { adminId, stylistId, date, timeSlot } = req.body;
+   const filter = { 
+    status: { $in: ["Accepted", "Rescheduled"] }
+   };
+  if(stylistId){
+    filter.stylist = stylistId
+  };
+
+  if(adminId){
+    filter.adminId = adminId
+  };
+
+  if(date){
+    filter.date = date
+  };
+
+  if(timeSlot){
+    filter.timeSlot = { $regex: timeSlot, $options: "i" }
+  };
   
-  const filter = {};
+  const appointment = await appointmentModel.find(filter);
+  return appointment
+};
+
+const availableAppointment = async (req) => {
+  const { stylistId, date, timeSlot } = req.body;
+   const filter = { 
+    status: { $in: ["Accepted", "Rescheduled"] }
+   };
   if(stylistId){
     filter.stylist = stylistId
   };
@@ -69,19 +108,17 @@ const availableSlot = async (req) => {
   };
 
   if(timeSlot){
-    filter.timeSlot = timeSlot
+    filter.timeSlot = { $regex: timeSlot, $options: "i" }
   };
-
-  const appointments = await appointmentModel.find(filter);
-  return appointments
-
-}
+    const appointment = await appointmentModel.findOne(filter);
+  return appointment
+};
 
 const updateAppointment = async (req) => {
-  const { appointmentId, stylistId } = req.body;
-
+  const { appointmentId } = req.body;
+  const updatedData = req.body;
   const update = await appointmentModel.findByIdAndUpdate({_id: appointmentId},
-    { $set: {stylist: stylistId}},
+    { $set: updatedData},
     { new: true }
   );
   return update
@@ -244,8 +281,8 @@ const getyearlyRevenue = async (req, res) => {
 module.exports = { 
     createAppointment,
     getAppointment,
-    availableSlot,
-    updateStatus,
+    availableStylist,
+    availableAppointment,
     getAppointmentbyUser,
     getAllAppointments,
     getTotalClients,
@@ -253,5 +290,6 @@ module.exports = {
     deleteAppointment,
     getTotalCustomers,
     updateAppointment,
-    getyearlyRevenue
+    getyearlyRevenue,
+    alreadyBooked
 };

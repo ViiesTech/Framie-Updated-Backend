@@ -111,7 +111,7 @@ const getAllSubServicesByAdminId = async (req) => {
 };
 
 const getSubServiceById = async (req) => {
-    const subServiceId = req.query.subServiceId;
+    const { subServiceId } = req.query;
     const subService = await subServiceModel.findById(subServiceId);
     return subService;
 };

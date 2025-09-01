@@ -17,6 +17,7 @@ router.post("/admin/login", adminController.login);
 router.post("/admin/updateAdmin",  auth.UploadAdmin.single("AdminImage"), adminController.updateProfile);
 router.get("/admin/adminByadminId", adminController.adminProfile);
 // auth.verifyAdmin,
+
 // Billing Details Routes
 router.post("/admin/addBilling", adminController.addBillingDetails);
 router.get("/admin/getBilling", auth.verifyAdmin, adminController.getBillingDetails);
@@ -27,6 +28,7 @@ router.post("/admin/addBusinessProfile", auth.verifyAdmin, auth.UploadBusiness.s
 router.get("/admin/getBusinessProfile", auth.verifyAdmin, businessProfileController.getBusinessProfile);
 router.post("/admin/updateBusinessProfile", auth.verifyAdmin, auth.UploadBusiness.single("BusinessImage"), businessProfileController.updateBusinessProfile);
 router.get("/admin/allBusinessProfiles", auth.verifyUser, businessProfileController.getAllBusinessProfiles);
+router.get("/user/getNearByBusinessProfiles", businessProfileController.nearByBusinessProfiles);
 
 // Services Routes
 router.post("/admin/addService", auth.verifyAdmin, auth.UploadService.single("ServiceImage"),serviceController.addService);
@@ -48,29 +50,25 @@ router.post("/admin/addStylist", auth.UploadEmployee.single("stylistImage"), sty
 router.post("/admin/stylistLogin", stylistController.login);
 router.get("/admin/getAllStylists", stylistController.getAllStylistsByAdmin);
 router.get("/admin/getStylistProfile", stylistController.getStylistProfile);
-router.post("/admin/updateStylist", auth.verifyAdmin, auth.UploadEmployee.single("stylistImage"), stylistController.updateStylist);
+router.post("/admin/updateStylist", auth.UploadEmployee.single("stylistImage"), stylistController.updateStylist);
+router.post("/admin/addSubservicesToStylist", stylistController.addSubservicesToStylist);
 router.post("/admin/deleteStylist", stylistController.deleteStylist);
 
 //Appointment Routes for Admin
 router.post("/admin/addAppointment", appointmentController.createAppointment);
 router.get("/admin/getAppointment", appointmentController.getAppointment);
 router.get("/admin/getAllAppointments",appointmentController.getAllAppointments);
-router.post("/admin/updateAppointmentStatus", appointmentController.updateStatus);
 router.post("/admin/updateAppointment", appointmentController.updateAppointment);
 router.get("/admin/getCustomers", appointmentController.getCustomers);
 router.get("/admin/getTotalCustomers", appointmentController.getTotalCustomers);
-
-// Appointments By User
-router.get("/user/getAppointmentsByUser", appointmentController.getAppointmentbyUser);
-router.post("/user/deleteAppointment", appointmentController.deleteAppointment);
 
 // Revenue By AdminId
 router.get("/admin/yearlyRevenue", appointmentController.getRevenue);
 
 // Walk-In Customer's Route 
 router.post("/admin/createWalkin", walkinController.createWalkin);
-router.get("/admin/getWalkinById", walkinController.getWalkinById);
 router.get("/admin/getAllWalkins", walkinController.getAllwalkins);
+router.get("/admin/getWalkinById", walkinController.getWalkinById);
 router.post("/admin/updateWalkin", walkinController.updatewalkinById);
 router.post("/admin/deleteWalkin", walkinController.deleteWalkinById);
 

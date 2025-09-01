@@ -104,6 +104,17 @@ const subServiceStorage = multer.diskStorage({
 
 const UploadSubService = multer({storage: subServiceStorage});
 
+const userStorage = multer.diskStorage({
+    destination: ( req, file, cb) => {
+        cb( null, "public/user")
+    },
+    filename:( req, file, cb ) => {
+        cb(null, Date.now() + "-" + file.originalname)
+    }
+});
+
+const uploadUser = multer({ storage: userStorage });
+
 
 module.exports = {
     verifyUser,
@@ -112,5 +123,6 @@ module.exports = {
     UploadBusiness,
     UploadEmployee,
     UploadService,
-    UploadSubService
+    UploadSubService,
+    uploadUser
 };

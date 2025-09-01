@@ -4,19 +4,28 @@ const royalityFunction = require("../functions/royalityPoint");
 
 const createAppointment = async (req, res) => {
     try {
-        const appointment = await appointmentFunction.createAppointment(req);
-        if(appointment === null){
+        const available = await appointmentFunction.availableAppointment(req);
+        console.log("Availability :", available);
+        // return
+        if(!available){
+            const appointment = await appointmentFunction.createAppointment(req);
+            if(appointment === null){
+                return res.status(200).json({
+                    success: false,
+                    msg: "Appointment Not created!"
+                })
+            } else {
+                const clientProfile = await clientProfileFunction.createClientProfile(req);
+                return res.status(200).json({
+                    success: true,
+                    msg: "Appointment Created Successfully!",
+                    data: appointment
+                })
+            }    
+        } else {
             return res.status(200).json({
                 success: false,
-                msg: "Appointment Not created!"
-            })
-        } else {
-            const clientProfile = await clientProfileFunction.createClientProfile(req);
-            // console.log("Client Profile Created :", clientProfile);
-            return res.status(200).json({
-                success: true,
-                msg: "Appointment Created Successfully!",
-                data: appointment
+                msg: "Stylist is Not Availale At this Time!"
             })
         }
     } catch (error) {
@@ -29,14 +38,21 @@ const createAppointment = async (req, res) => {
     }
 };
 
-const getAppointment = async (req, res) => {
+const getAvailableStylist = async (req, res) => {
     try {
-        const appointment = await appointmentFunction.getAppointment(req);
-        return res.status(200).json({
-            success: true,
-            msg: "Appointment Details!",
-            data: appointment
-        })
+        const available = await appointmentFunction.availableStylist(req);
+        if(available.length === 0){
+            return res.status(200).json({
+                success: true,
+                msg: "No Stylist Available!"
+            })
+        } else {
+            return res.status(200).json({
+                success: true,
+                msg: "Available Stylists!",
+                data: available
+            })
+        }
     } catch (error) {
         console.log("Having Errors: ", error);
         return res.status(403).json({
@@ -45,27 +61,16 @@ const getAppointment = async (req, res) => {
             error
         })
     }
-};
+}  
 
-const updateStatus = async (req, res) => {
+const getAppointment = async (req, res) => {
     try {
-        const update = await appointmentFunction.updateStatus(req);
-        console.log("object :", update.status);
-        // return 
-        if(update.status === "Completed"){
-            const royality = await royalityFunction.createRoyality(update);
-            return res.status(200).json({
-                success: true,
-                msg: "Appointment Marked As Completed!",
-                data: update
-            })
-        } else {
-            return res.status(200).json({
-                success: true,
-                msg: "Appointment Updated to Accepted!",
-                data: update
-            })
-        };
+        const appointment = await appointmentFunction.getAppointment(req);
+        return res.status(200).json({
+            success: true,
+            msg: "Appointment Details!",
+            data: appointment
+        })
     } catch (error) {
         console.log("Having Errors: ", error);
         return res.status(403).json({
@@ -97,11 +102,18 @@ const getAppointmentbyUser = async (req, res) => {
 const getAllAppointments = async (req, res) => {
     try {
         const appointments = await appointmentFunction.getAllAppointments(req);
-        return res.status(200).json({
-            success: true,
-            msg: "All Appointments by Stylist!",
-            data: appointments
-        })
+        if(appointments.length === 0){
+            return res.status(200).json({
+                success: true,
+                msg: "No Appointments Found!"
+            })
+        } else {
+            return res.status(200).json({
+                success: true,
+                msg: "All Appointments by Stylist!",
+                data: appointments
+            })
+        }
     } catch (error) {
         console.log("Having Errors: ", error);
         return res.status(403).json({
@@ -203,14 +215,40 @@ const getRevenue = async (req, res) => {
             error: error.message
         })
     }
+};
+
+const getAlreadyBookedAppointments = async (req, res) => {
+    try {
+        const booked = await appointmentFunction.alreadyBooked(req);
+        if(booked.lenght === 0){
+            return res.status(200).json({
+                success: true,
+                msg: "All Slots Available!"
+            })
+        } else {
+            return res.status(200).json({
+                success: true,
+                msg: "Already Booked Slots!",
+                data: booked 
+            })
+        }
+    } catch (error) {
+        console.log("Having Errors :", error);
+        return res.status(200).json({
+            success: false,
+            msg: "Having Errors",
+            error: error.message
+        })        
+    }
 }
 
 module.exports = { 
     createAppointment,
     getAppointment,
-    updateStatus,
     getAppointmentbyUser,
     getAllAppointments,
+    getAvailableStylist,
+    getAlreadyBookedAppointments,
     getCustomers,
     deleteAppointment,
     getTotalCustomers,

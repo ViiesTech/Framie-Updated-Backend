@@ -12,6 +12,9 @@ const userSchema = new Schema({
         type: Number,
         // required: true,
     },
+    profileImage:{
+        type: String
+    },
     city:{
         type: String,
     },

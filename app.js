@@ -34,6 +34,10 @@ app.use("/",
     express.static( path.resolve(__dirname, "./public/subService/"))
 );
 
+app.use("/",
+    express.static( path.resolve(__dirname, "./public/user/"))
+);
+
 app.use(express.json());
 
 app.use("/api", require("./routes/superAdmin"));

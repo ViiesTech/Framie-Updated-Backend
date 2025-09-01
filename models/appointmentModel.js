@@ -24,11 +24,11 @@ const appointmointSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Category"
     },
-    services:[{
+    services:{
         type: Schema.Types.ObjectId,
         ref: "Subservice",
         required: true
-    }],
+    },
     stylist:{
         type: Schema.Types.ObjectId,
         ref: "Stylist",
@@ -41,6 +41,12 @@ const appointmointSchema = new Schema({
         type: String,
         required: true,
     },
+    previousSlot: {
+        type: String,
+    },
+    previousDate: {
+        type: String,
+    },
     notes:{
         type: String,
     },
@@ -48,31 +54,25 @@ const appointmointSchema = new Schema({
         type: Number,
         required: true
     },
-    // createdByModel: {
-    //     type: String,
-    //     required: true,
-    //     enum:["User", "Admin"]
-    // },
-    // createdBy:{
-    //     type: Schema.Types.ObjectId,
-    //     refPath:"createdByModel",
-    //     required: true,
-    // },
     status: {
         type: String,
-        enum:["Pending", "Accepted", "Completed", "Cancelled", "Rescheduled"],
+        enum:["Pending", "Accepted", "Completed", "Cancelled", "Rescheduled", "Request"],
         default: "Pending"
     },
     cancelledByModel: {
         type: String,
-        required: true,
-        enum:["User", "Stylist"]
+        enum:["User", "Stylist", "Admin"]
     },
     cancelledBy:{
         type: Schema.Types.ObjectId,
         refPath:"cancelledByModel",
-        required: true,
     },
+    cancelationReason: {
+        type: String
+    },
+    rescheduledReason: {
+        type: String
+    }
 }, { timestamps: true })
 
 const appointmointModel = mongoose.model("Appointment", appointmointSchema)

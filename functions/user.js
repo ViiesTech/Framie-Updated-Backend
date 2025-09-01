@@ -72,11 +72,23 @@ const getProfile = async (req) => {
 const updateUser = async (req) => {
     const userId = req.user.id;
     const userData = req.body;
+    const {latitude, longitude, locationName} = req.body;
+
+    if( longitude && latitude ){
+        userData.location = {
+            type: "Point",
+            coordinates: [parseFloat(longitude), parseFloat(latitude)],
+            locationName: locationName || null
+        }
+    };
+    if(req.file && req.file.filename){
+        userData.profileImage = req.file.filename;
+    }
 
     const updated = await userModel.findByIdAndUpdate({
         _id: userId},
         {$set: userData},
-        { new: true });
+        { new: true }).select("-password");
     return updated;
 };
 

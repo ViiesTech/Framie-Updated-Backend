@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const favoriteSchema = new Schema({
     salonId: {
         type: Schema.Types.ObjectId,
-        ref: "BusinessDetail",
+        ref: "Salon",
         required: true
     },
     userId:{

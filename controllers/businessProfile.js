@@ -84,9 +84,35 @@ const getAllBusinessProfiles = async (req, res) => {
     }
 };
 
+const nearByBusinessProfiles = async (req, res) => {
+    try {
+        const businessProfiles = await businessProfileFunction.getNearByBusinessProfiles(req);
+        if( businessProfiles.length === 0 ){
+            return res.status(200).json({
+                success: false,
+                msg: "No Nearby Salon Found!"
+            })
+        } else {
+            return res.status(200).json({
+                success: true,
+                msg: "Nearby Salons!",
+                data: businessProfiles
+            })
+        }
+    } catch (error) {
+        console.log("Having Errors: ", error);
+        return res.status(403).json({
+            success: false,
+            msg: "Having Errors!",
+            error
+        })
+    }
+}
+
 module.exports = {
     addBusinessProfile,
     getBusinessProfile,
     updateBusinessProfile,
-    getAllBusinessProfiles
+    getAllBusinessProfiles,
+    nearByBusinessProfiles
 };

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const businessSchema = new Schema({
+const salonSchema = new Schema({
     adminId:{
         type: Schema.Types.ObjectId,
         ref:"Admin",
@@ -69,7 +69,7 @@ const businessSchema = new Schema({
     }]
 }, { timestamps: true });
 
-businessSchema.index({ location: "2dsphere" });
+salonSchema.index({ location: "2dsphere" });
 
-const businessModel = mongoose.model("BusinessDetail", businessSchema);
-module.exports = businessModel;
+const salonModel = mongoose.model("Salon", salonSchema);
+module.exports = salonModel;

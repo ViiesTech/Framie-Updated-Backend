@@ -1,5 +1,6 @@
 const adminModel = require("../models/AdminModel");
-const businessModel = require("../models/businessProfile");
+const salonModel = require("../models/businessProfile");
+const { options } = require("../routes/admin");
 
 const addBusinessProfile = async (req) => {
     const categories = JSON.parse(req.body.categories);
@@ -9,7 +10,7 @@ const addBusinessProfile = async (req) => {
             coordinates: [parseFloat(req.body.longitude), parseFloat(req.body.latitude)],
             locationName: req.body.locationName || null
         };
-    const newBusiness = new businessModel(req.body);
+    const newBusiness = new salonModel(req.body);
     newBusiness.categories = categories;
     newBusiness.workingDays = workingDays;
     newBusiness.profileImage = req.file.filename;
@@ -19,55 +20,88 @@ const addBusinessProfile = async (req) => {
 };
 
 const getBusinessProfile = async (req) => {
-    const adminId = req.admin.id;
-    const businessProfile = await businessModel.findOne({adminId: adminId}).populate("categories");
+    let adminId = {};
+    if(req.query){
+        adminId = req.query.adminId;
+        console.log("adminId Query:", adminId)
+    }
+    if(req.admin){
+        adminId = req.admin.id
+        console.log("adminId Token:", adminId)
+    };
+    // return
+    const businessProfile = await salonModel.findOne({adminId: adminId}).populate("categories");
     return businessProfile;
 };
 
 const updateBusinessProfile = async (req) => {
     const adminId = req.admin.id;
     const updatedData = req.body;
-    updatedData.availableServices = JSON.parse(updatedData.availableServices);
-    updatedData.workingDays = JSON.parse(updatedData.workingDays); 
-    const updatedProfile = await businessModel.findOneAndUpdate({adminId: adminId}, { $set: updatedData }, { new: true });
+    if(updatedData.availableServices){
+        updatedData.availableServices = JSON.parse(updatedData.availableServices);
+    };
+    if(updatedData.workingDays){
+        updatedData.workingDays = JSON.parse(updatedData.workingDays);
+    };
+    if(req.file && req.file.filename){
+        updatedData.profileImage = req.file.filename
+    };
+    if(updatedData.longitude && updatedData.latitude){
+        updatedData.location = {
+            type: "Point",
+            coordinates: [parseFloat(updatedData.longitude), parseFloat(updatedData.latitude)],
+            locationName: updatedData.locationName || null
+        }
+    };
+    const updatedProfile = await salonModel.findOneAndUpdate({adminId: adminId}, { $set: updatedData }, { new: true });
     return updatedProfile;
 };
 
 const getAllBusinessProfiles = async (req) => {
-    const allProfiles = await businessModel.find();
+    const { adminId, businessName, categoryId } = req.query;
+    const filter = {};
+    if(adminId){
+        filter.adminId = adminId
+    };
+    if(businessName){
+        filter.businessName = { $regex: businessName, options: "i" }
+    };
+    if(categoryId){
+        filter.categories = { $in: [categoryId] }
+    }
+    const allProfiles = await salonModel.find(filter);
     return allProfiles;
 };
 
 const getNearByBusinessProfiles = async (req) => {
-    const { logitude, latitude } = req.body;
+    const { longitude, latitude } = req.query;
 
     const location = {
         type: "Point",
         coordinates: [
-            parseFloat(req.body.longitude),
-            parseFloat(req.body.latitude)
+            parseFloat(longitude),
+            parseFloat(latitude)
         ]
     };
 
-    const business = await businessModel.find({
+    const business = await salonModel.find({
         location:{
             $near:{
                 $geometry: {
                     type: "Point",
                     coordinates: location.coordinates
                 },
-                $maxdDistance: 100000
+                $maxDistance: 100000
             }
         }
     }); 
     return business
 }; 
 
-
-
 module.exports = { 
     addBusinessProfile,
     getBusinessProfile,
     updateBusinessProfile,
     getAllBusinessProfiles,
+    getNearByBusinessProfiles,
 };

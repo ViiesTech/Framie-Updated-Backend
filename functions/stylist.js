@@ -51,22 +51,35 @@ const getStylistProfile = async (req, userId) => {
 };
 
 const updateStylist = async (req) => {
-    const createdBy = req.admin.id;
-    // console.log("object :", createdBy);
+    const { stylistId } = req.body;
     const updatedData = req.body;
-    updatedData.workinDays = JSON.parse(updatedData.workingDays); 
-    const updatedStylist = await stylistModel.findOneAndUpdate({createdBy: createdBy}, { $set: updatedData }, { new: true});
+    if(req.body.workinDays){
+        updatedData.workinDays = JSON.parse(updatedData.workingDays);
+    };
+
+    if(req.file && req.file.filename){
+        updatedData.stylistImage = req.file.filename
+    };
+
+    if(req.body.availableServices){
+        updatedData.availableServices = JSON.parse(updatedData.availableServices);
+    }
+     
+    const updatedStylist = await stylistModel.findOneAndUpdate(stylistId, 
+        { $set: updatedData }, 
+        { new: true}
+    );
     return updatedStylist
 };
 
 const addSubservicesToStylist = async (req) =>{
-    const { subServiceId, stylistId } = req.query;
+    const { subServiceId, stylistId } = req.body;
     const stylist = await stylistModel.findById(stylistId);
     if(stylist.availableServices.includes(subServiceId)){
         const stylist = await stylistModel.findByIdAndUpdate(stylistId, 
             { $pull: { availableServices: subServiceId }},
             { new: true }
-        );
+        ).select("-password");
         const unAssign = await subServiceModel.findByIdAndUpdate(subServiceId,
             { $pull: { assignedTo: stylistId}},
             { new: true }
@@ -76,7 +89,7 @@ const addSubservicesToStylist = async (req) =>{
         const stylist = await stylistModel.findByIdAndUpdate(stylistId, 
             { $push: { availableServices: subServiceId } },
             { new: true }
-        );
+        ).select("-password");
         const assign = await subServiceModel.findByIdAndUpdate({_id: subServiceId},
             { $push: {assignedTo: stylistId}},
             { new: true}

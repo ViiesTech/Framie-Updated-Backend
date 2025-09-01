@@ -13,7 +13,7 @@ const getWalkinAppointmentbyId = async (req) => {
 };
 
 const getAllWalkinAppointments = async (req) => {
-    const { phone, date, serviceId, stylistId, timeSlot } = req.query;
+    const { phone, date, subServiceId, stylistId, timeSlot } = req.query;
     const filter = {};
 
     if(phone){
@@ -24,8 +24,8 @@ const getAllWalkinAppointments = async (req) => {
         filter.date = date;
     };
 
-    if(serviceId){
-        filter.serviceId = serviceId;
+    if(subServiceId){
+        filter.subServiceId = subServiceId;
     };
 
     if(stylistId){

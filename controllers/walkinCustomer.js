@@ -54,7 +54,8 @@ const getAllwalkins = async (req, res) => {
         } else {
             return res.status(200).json({
                 success: true,
-                msg: "All Walk-Ins!" 
+                msg: "All Walk-Ins!",
+                data: walkins 
             })
         }
     } catch (error) {
