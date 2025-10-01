@@ -49,6 +49,7 @@ router.post("/admin/deleteSubservice", serviceController.deleteSubService);
 router.post("/admin/addStylist", auth.UploadEmployee.single("stylistImage"), stylistController.addStylist);
 router.post("/admin/stylistLogin", stylistController.login);
 router.get("/admin/getAllStylists", stylistController.getAllStylistsByAdmin);
+router.get("/user/getAllStylists", stylistController.getAllStylistsByAdmin);
 router.get("/admin/getStylistProfile", stylistController.getStylistProfile);
 router.post("/admin/updateStylist", auth.UploadEmployee.single("stylistImage"), stylistController.updateStylist);
 router.post("/admin/addSubservicesToStylist", stylistController.addSubservicesToStylist);

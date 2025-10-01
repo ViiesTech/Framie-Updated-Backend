@@ -9,7 +9,7 @@ const signup = async (req) => {
     const newUser = new userModel({
         firstName,
         lastName,
-        phNumber,
+        phNumber: phNumber || null,
         city,
         email,
         password: hash,

@@ -220,7 +220,7 @@ const getRevenue = async (req, res) => {
 const getAlreadyBookedAppointments = async (req, res) => {
     try {
         const booked = await appointmentFunction.alreadyBooked(req);
-        if(booked.lenght === 0){
+        if(booked.length === 0){
             return res.status(200).json({
                 success: true,
                 msg: "All Slots Available!"

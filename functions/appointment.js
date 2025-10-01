@@ -42,7 +42,10 @@ const getAllAppointments = async (req) => {
     filter.status = status
   };
 
-  const appointments = await appointmentModel.find(filter);
+  const appointments = await appointmentModel.find(filter).populate({
+    path: "services",
+    select: "title text subServiceImage proce"
+  });
   return appointments;
 };
 
@@ -70,7 +73,7 @@ const availableStylist = async (req) => {
 };
 
 const alreadyBooked = async (req) => {
-  const { adminId, stylistId, date, timeSlot } = req.body;
+  const { adminId, stylistId, date, timeSlot } = req.query;
    const filter = { 
     status: { $in: ["Accepted", "Rescheduled"] }
    };

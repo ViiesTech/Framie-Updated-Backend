@@ -7,8 +7,11 @@ const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3040;
 const connectDB = require('./db/config')
+require("dotenv").config();
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.AllowedOrigin
+}));
 
 app.get('/', (req, res) =>{
     res.send('Api Is Working')

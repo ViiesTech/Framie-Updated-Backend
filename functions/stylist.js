@@ -20,7 +20,7 @@ const getAllStylistsByAdmin = async (req) => {
     const adminId = req.query.adminId;
     const allStylists = await stylistModel.find({createdBy: adminId}).select("-password").populate({
         path: "availableServices",
-        select: "serviceId",
+        // select: "_id serviceId",
         populate:{
             path: "serviceId",
             model: "Service",

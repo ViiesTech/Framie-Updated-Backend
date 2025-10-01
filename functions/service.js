@@ -106,13 +106,19 @@ const updatedSubService = async (req) => {
 
 const getAllSubServicesByAdminId = async (req) => {
     const adminId = req.admin._id
-    const subServices = await subServiceModel.find({adminId: adminId}).populate("categoryId").populate("serviceId");
+    const subServices = await subServiceModel.find({adminId: adminId}).populate("categoryId").populate("serviceId").populate({
+        path: "assignedTo",
+        select: "createdBy salonId stylistName stylistImage"
+    });
     return subServices;
 };
 
 const getSubServiceById = async (req) => {
     const { subServiceId } = req.query;
-    const subService = await subServiceModel.findById(subServiceId);
+    const subService = await subServiceModel.findById(subServiceId).populate({
+        path: "assignedTo",
+        select: "createdBy salonId stylistName stylistImage"
+    });;
     return subService;
 };
 
@@ -131,7 +137,10 @@ const getAllSubServices = async (req) => {
     if(stylistId){
         filter.assignedTo = { $in: [stylistId] };
     }
-    const subServices = await subServiceModel.find(filter);
+    const subServices = await subServiceModel.find(filter).populate({
+        path: "assignedTo",
+        select: "createdBy salonId stylistName stylistImage"
+    });;
     return subServices;
 };
 
