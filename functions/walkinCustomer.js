@@ -13,30 +13,17 @@ const getWalkinAppointmentbyId = async (req) => {
 };
 
 const getAllWalkinAppointments = async (req) => {
-    const { phone, date, subServiceId, stylistId, timeSlot } = req.query;
+    const { phone, date, subServiceId, stylistId, timeSlot ,adminId } = req.query;
     const filter = {};
 
-    if(phone){
-        filter.phone = phone; 
-    };
+    if(phone) filter.phone = phone;
+    if(date) filter.date = date;
+    if(subServiceId) filter.subService = subServiceId;
+    if(stylistId) filter.stylist = stylistId;;
+    if(adminId) filter.adminId = adminId
+    if(timeSlot) filter.timeSlot = timeSlot;
 
-    if(date){
-        filter.date = date;
-    };
-
-    if(subServiceId){
-        filter.subServiceId = subServiceId;
-    };
-
-    if(stylistId){
-        filter.stylistId = stylistId;
-    };
-
-    if(timeSlot){
-        filter.timeSlot = timeSlot
-    };
-
-    const walkinAppointments = await walkinModel.find(filter);
+    const walkinAppointments = await walkinModel.find(filter).populate("stylist subService");
     return walkinAppointments;
 };
 

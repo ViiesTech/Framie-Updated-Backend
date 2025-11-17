@@ -26,7 +26,7 @@ const walkinSchema = new Schema({
     },
     stylist: {
         type: Schema.Types.ObjectId,
-        ref: "Subservice",
+        ref: "Stylist",
         required: true
     },
     timeSlot: {
