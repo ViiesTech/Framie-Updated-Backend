@@ -9,10 +9,15 @@ const PORT = process.env.PORT || 3040;
 const connectDB = require('./db/config')
 require("dotenv").config();
 
-app.use(cors({
-    origin: process.env.AllowedOrigin
-}));
-
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://framie-new.vercel.app"
+    ],
+    credentials: true
+  })
+);
 app.get('/', (req, res) =>{
     res.send('Api Is Working')
 });

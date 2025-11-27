@@ -76,7 +76,19 @@ const getAllClients = async (req) => {
     const result = await clientProfileModel.find({adminId: adminId}).populate({
         path: "userId",
         select: "-password"
-    }).populate("previousAppointments");
+    }).populate({
+        path: "previousAppointments",
+        options: { sort: { date: -1 } } ,
+        populate: [{
+            path: "services",
+            model: "Subservice"
+        },
+        {
+            path: "stylist",
+            model: "Stylist",
+            select: "stylistName stylistImage about"
+        }]
+    });
     return result
 };
 

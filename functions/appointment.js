@@ -45,7 +45,7 @@ const getAllAppointments = async (req) => {
   const appointments = await appointmentModel.find(filter).populate({
     path: "services",
     select: "title text subServiceImage proce"
-  });
+  }).populate("stylist", "-password");
   return appointments;
 };
 
