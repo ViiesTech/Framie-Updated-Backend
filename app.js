@@ -52,6 +52,7 @@ app.use("/api", require("./routes/superAdmin"));
 app.use("/api", require("./routes/admin"));
 app.use("/api", require("./routes/user"));
 app.use("/api", require("./routes/reviews"));
+app.use("/api", require("./routes/reward"));
 
 const start = () => {
     try {

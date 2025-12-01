@@ -7,7 +7,7 @@ const appointmointSchema = new Schema({
         ref: "User",
         required: true
     },
-    adminId:{
+    adminId: {
         type: Schema.Types.ObjectId,
         ref: "Admin",
         required: true
@@ -24,20 +24,21 @@ const appointmointSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Category"
     },
-    services:{
+    services: {
         type: Schema.Types.ObjectId,
         ref: "Subservice",
         required: true
     },
-    stylist:{
+    stylist: {
         type: Schema.Types.ObjectId,
         ref: "Stylist",
+        required: true
     },
-    previousStylist:{
+    previousStylist: {
         type: Schema.Types.ObjectId,
         ref: "Stylist"
     },
-    timeSlot:{
+    timeSlot: {
         type: String,
         required: true,
     },
@@ -47,25 +48,25 @@ const appointmointSchema = new Schema({
     previousDate: {
         type: String,
     },
-    notes:{
+    notes: {
         type: String,
     },
-    price:{
+    price: {
         type: Number,
         required: true
     },
     status: {
         type: String,
-        enum:["Pending", "Accepted", "Completed", "Cancelled", "Rescheduled", "Request"],
+        enum: ["Pending", "Accepted", "Completed", "Cancelled", "Rescheduled", "Request"],
         default: "Pending"
     },
     cancelledByModel: {
         type: String,
-        enum:["User", "Stylist", "Admin"]
+        enum: ["User", "Stylist", "Admin"]
     },
-    cancelledBy:{
+    cancelledBy: {
         type: Schema.Types.ObjectId,
-        refPath:"cancelledByModel",
+        refPath: "cancelledByModel",
     },
     cancelationReason: {
         type: String

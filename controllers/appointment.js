@@ -183,7 +183,7 @@ const getTotalCustomers = async (req, res) => {
 
 const updateAppointment = async (req, res) => {
     try {
-        const appointment = await appointmentFunction.updateAppointment(req);
+        const appointment = await appointmentFunction.updateAppointment(req , res);
         return res.status(200).json({
             success: true,
             msg: "Appointment Details updated!",

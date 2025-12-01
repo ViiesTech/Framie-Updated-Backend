@@ -54,6 +54,7 @@ router.get("/admin/getStylistProfile", stylistController.getStylistProfile);
 router.post("/admin/updateStylist", auth.UploadEmployee.single("stylistImage"), stylistController.updateStylist);
 router.post("/admin/addSubservicesToStylist", stylistController.addSubservicesToStylist);
 router.post("/admin/deleteStylist", stylistController.deleteStylist);
+router.get('/admin/getDashboardStats/:stylistId' , stylistController.getDashboardStats)
 
 //Appointment Routes for Admin
 router.post("/admin/addAppointment", appointmentController.createAppointment);

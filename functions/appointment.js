@@ -3,9 +3,12 @@ const subServiceModel = require("../models/subServices");
 const mongoose = require("mongoose");
 const moment = require("moment");
 const stylistModel = require("../models/stylist");
+const userSalonVisit = require("../models/userSalonVisit");
+const userModel = require("../models/userModel");
+const salonModel = require("../models/businessProfile");
 
 const createAppointment = async (req) => {
-  if(req.body.createdByModel === "Admin"){
+  if (req.body.createdByModel === "Admin") {
     const newAppointment = new appointmentModel(req.body);
     const result = await newAppointment.save();
     return result;
@@ -13,32 +16,32 @@ const createAppointment = async (req) => {
     const newAppointment = new appointmentModel(req.body);
     const result = await newAppointment.save();
     return result;
-  } 
+  }
 };
 
 const getAppointment = async (req) => {
-    const appointmentId = req.query.appointmentId;
-    const appointment = await appointmentModel.findById({_id: appointmentId});
-    return appointment;
+  const appointmentId = req.query.appointmentId;
+  const appointment = await appointmentModel.findById({ _id: appointmentId });
+  return appointment;
 };
 
 const getAppointmentbyUser = async (req) => {
-    const userId = req.query.userId;
-    const appointment = await appointmentModel.find({userId: userId});
-    return appointment
+  const userId = req.query.userId;
+  const appointment = await appointmentModel.find({ userId: userId });
+  return appointment
 };
 
 const getAllAppointments = async (req) => {
   const { adminId, stylistId, status } = req.query;
 
   const filter = {};
-  if(adminId){
+  if (adminId) {
     filter.adminId = adminId
   };
-  if(stylistId){
+  if (stylistId) {
     filter.stylist = stylistId
   };
-  if(status){
+  if (status) {
     filter.status = status
   };
 
@@ -52,21 +55,21 @@ const getAllAppointments = async (req) => {
 const availableStylist = async (req) => {
   const { serviceId, date, timeSlot } = req.query;
 
-  const service = await subServiceModel.findById({_id: serviceId});
+  const service = await subServiceModel.findById({ _id: serviceId });
 
   const appointments = await appointmentModel.distinct("stylist", {
     services: new mongoose.Types.ObjectId(serviceId),
     date,
-    timeSlot: {$regex: `^${timeSlot}$`, $options: "i"},
+    timeSlot: { $regex: `^${timeSlot}$`, $options: "i" },
     status: { $in: ["Accepted", "Rescheduled"] }
   });
   const availableStylistIds = service.assignedTo.filter(
-  stylistId => !appointments.map(String).includes(String(stylistId))
+    stylistId => !appointments.map(String).includes(String(stylistId))
   );
 
   const availableStylists = await stylistModel.find({
-      _id: { $in: availableStylistIds }
-    }).select("email stylistName about stylistImage");
+    _id: { $in: availableStylistIds }
+  }).select("email stylistName about stylistImage");
 
   return availableStylists
 
@@ -74,68 +77,107 @@ const availableStylist = async (req) => {
 
 const alreadyBooked = async (req) => {
   const { adminId, stylistId, date, timeSlot } = req.query;
-   const filter = { 
+  const filter = {
     status: { $in: ["Accepted", "Rescheduled"] }
-   };
-  if(stylistId){
+  };
+  if (stylistId) {
     filter.stylist = stylistId
   };
 
-  if(adminId){
+  if (adminId) {
     filter.adminId = adminId
   };
 
-  if(date){
+  if (date) {
     filter.date = date
   };
 
-  if(timeSlot){
+  if (timeSlot) {
     filter.timeSlot = { $regex: timeSlot, $options: "i" }
   };
-  
+
   const appointment = await appointmentModel.find(filter);
   return appointment
 };
 
 const availableAppointment = async (req) => {
   const { stylistId, date, timeSlot } = req.body;
-   const filter = { 
+  const filter = {
     status: { $in: ["Accepted", "Rescheduled"] }
-   };
-  if(stylistId){
+  };
+  if (stylistId) {
     filter.stylist = stylistId
   };
 
-  if(date){
+  if (date) {
     filter.date = date
   };
 
-  if(timeSlot){
+  if (timeSlot) {
     filter.timeSlot = { $regex: timeSlot, $options: "i" }
   };
-    const appointment = await appointmentModel.findOne(filter);
+  const appointment = await appointmentModel.findOne(filter);
   return appointment
 };
 
-const updateAppointment = async (req) => {
-  const { appointmentId } = req.body;
+const updateAppointment = async (req, res) => {
+  const { appointmentId, status } = req.body;
   const updatedData = req.body;
-  const update = await appointmentModel.findByIdAndUpdate({_id: appointmentId},
-    { $set: updatedData},
+  if (status === "Completed") {
+
+    if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+      throw new Error("Invalid appointmentId");
+    }
+
+    const appointment = await appointmentModel.findById(appointmentId);
+    if (!appointment) throw new Error("Appointment not found");
+
+    const stylist = await stylistModel.findById(appointment.stylist);
+    if (!stylist) throw new Error("Stylist not found");
+    if (!stylist.salonId) throw new Error("Salon id not found in stylist");
+    if (!appointment.userId) throw new Error("User id not found in appointment");
+
+    const userId = appointment.userId;
+    const salonId = stylist.salonId;
+        
+    // Ensure User exists
+    const userExists = await userModel.exists({ _id: userId });
+    if (!userExists) throw new Error("User not found");
+
+    // Ensure Salon exists
+    const salonExists = await salonModel.exists({ _id: salonId });
+    if (!salonExists) throw new Error("Salon not found");
+
+    let userVisit = await userSalonVisit.findOne({ user: userId, salon: salonId });
+
+    if (!userVisit) {
+      userVisit = await userSalonVisit.create({
+        user: userId,
+        salon: salonId,
+        totalVisits: 1,
+      });
+    } else {
+      userVisit.totalVisits += 1;
+    }
+
+    await userVisit.save();
+  }
+  const update = await appointmentModel.findByIdAndUpdate({ _id: appointmentId },
+    { $set: updatedData },
     { new: true }
   );
   return update
 };
 
 const deleteAppointment = async (req) => {
-    const { appointmentId } = req.query;
-    const result = await appointmentModel.findByIdAndDelete({_id: appointmentId});
-    return result 
+  const { appointmentId } = req.query;
+  const result = await appointmentModel.findByIdAndDelete({ _id: appointmentId });
+  return result
 };
 
 const getTotalClients = async (req) => {
   const { adminId } = req.query;
-  const appointment = await appointmentModel.find({adminId: adminId}).countDocuments();
+  const appointment = await appointmentModel.find({ adminId: adminId }).countDocuments();
   return appointment
 };
 
@@ -152,25 +194,25 @@ const totalIncome = async (req) => {
 
 const getTotalCustomers = async (req) => {
   const { adminId, type } = req.query;
-  
+
   const today = moment();
   const filter = { adminId };
 
-  if(type === "day"){
+  if (type === "day") {
     const todaystr = today.format("D-M-YYYY");
-    filter.date = todaystr; 
-  } else if( type === "week"){
+    filter.date = todaystr;
+  } else if (type === "week") {
     const weekDates = [];
     for (let i = 0; i < 7; i++) {
-    weekDates.push(today.clone().subtract(i, 'days').format('D-M-YYYY'));
+      weekDates.push(today.clone().subtract(i, 'days').format('D-M-YYYY'));
     }
     console.log("object", weekDates);
     filter.date = { $in: weekDates };
     // return
-  } else if( type === "month"){
+  } else if (type === "month") {
     const month = today.month() + 1;
     const year = today.year();
-    filter.date = { $regex: new RegExp(`^\\d{1,2}-(0?${month})-${year}$`)};
+    filter.date = { $regex: new RegExp(`^\\d{1,2}-(0?${month})-${year}$`) };
   }
 
   const total = await appointmentModel.find(filter).countDocuments();
@@ -281,18 +323,18 @@ const getyearlyRevenue = async (req, res) => {
 };
 
 
-module.exports = { 
-    createAppointment,
-    getAppointment,
-    availableStylist,
-    availableAppointment,
-    getAppointmentbyUser,
-    getAllAppointments,
-    getTotalClients,
-    totalIncome,
-    deleteAppointment,
-    getTotalCustomers,
-    updateAppointment,
-    getyearlyRevenue,
-    alreadyBooked
+module.exports = {
+  createAppointment,
+  getAppointment,
+  availableStylist,
+  availableAppointment,
+  getAppointmentbyUser,
+  getAllAppointments,
+  getTotalClients,
+  totalIncome,
+  deleteAppointment,
+  getTotalCustomers,
+  updateAppointment,
+  getyearlyRevenue,
+  alreadyBooked
 };
