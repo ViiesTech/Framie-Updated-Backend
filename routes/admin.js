@@ -64,7 +64,7 @@ router.post("/admin/updateAppointment", appointmentController.updateAppointment)
 router.get("/admin/getCustomers", appointmentController.getCustomers);
 router.get("/admin/getTotalCustomers", appointmentController.getTotalCustomers);
 
-// Revenue By AdminId
+// Revenue By AdminId//
 router.get("/admin/yearlyRevenue", appointmentController.getRevenue);
 
 // Walk-In Customer's Route 
