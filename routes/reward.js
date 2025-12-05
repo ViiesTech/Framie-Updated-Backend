@@ -17,4 +17,6 @@ router.route('/reward/:rewardId')
 router.post("/reward/check", rewardControllers.checkUserReward);
 router.post("/reward/claimReward", rewardControllers.claimReward);
 
+router.get('/getVisit' , rewardControllers.getVisit)
+
 module.exports = router

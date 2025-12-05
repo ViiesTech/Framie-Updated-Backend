@@ -102,6 +102,7 @@ const deleteReward = async (req, res) => {
 const getReward = async (req, res) => {
     try {
         const { rewardId } = req.params;
+        const { salonId } = req.query;
 
         if (rewardId) {
             if (!mongoose.Types.ObjectId.isValid(rewardId)) {
@@ -120,7 +121,16 @@ const getReward = async (req, res) => {
             return res.status(200).json({ success: true, reward });
         }
 
-        const rewards = await Reward.find().populate([
+        const filter = {};
+
+        if (salonId) {
+            if (!mongoose.Types.ObjectId.isValid(salonId)) {
+                return res.status(400).json({ success: false, msg: "Invalid salonId" });
+            }
+            filter.salon = salonId;
+        }
+
+        const rewards = await Reward.find(filter).populate([
             { path: "salon", select: '_id businessName profileImage' },
             { path: "admin", select: 'firstName lastName _id' }
         ]);
@@ -319,6 +329,56 @@ const claimReward = async (req, res) => {
     }
 };
 
+const getVisit = async (req, res) => {
+    try {
+        const { userId, salonId } = req.query;
+
+        if (!userId && !salonId) {
+            return res.status(400).json({
+                success: false, message: "Please provide userId or salonId"
+            });
+        }
+
+        let query = {};
+
+        if (userId) {
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                return res.status(400).json({ success: false, msg: "Invalid userId" });
+            }
+            query.user = userId;
+        }
+
+        if (salonId) {
+            if (!mongoose.Types.ObjectId.isValid(salonId)) {
+                return res.status(400).json({ success: false, msg: "Invalid salonId" });
+            }
+            query.salon = salonId;
+        }
+
+        const visits = await userSalonVisit.find(query)
+            .populate({ path: "user", select: "_id firstName lastName profileImage email phNumber" })
+            .populate({ path: "salon", select: '_id businessName profileImage' })
+
+        if (!visits || visits.length === 0) {
+            return res.status(404).json({
+                success: false, msg: "No visit records found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true, message: 'Visit fetched successfully', visits
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            msg: "Server error",
+            error: error.message
+        });
+    }
+}
+
 module.exports = {
-    createReward, updateReward, deleteReward, getReward, checkUserReward, claimReward
+    createReward, updateReward, deleteReward, getReward, checkUserReward, claimReward , getVisit
 }
