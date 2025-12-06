@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const appointmointModel = require("../models/appointmentModel");
 const userModel = require("../models/userModel");
 const stylistModel = require("../models/stylist");
+const walkinModel = require("../models/walkinCustomer");
 require("dotenv").config();
 
 const login = async (req, res) => {
@@ -217,6 +218,10 @@ const getDashboardStats = async (req, res) => {
             createdAt: { $gte: thirtyDaysAgo }
         });
 
+        const walkinCount = await walkinModel.countDocuments({
+            stylist: stylistId
+        });
+
 
         return res.status(200).json({
             success: true,
@@ -226,7 +231,8 @@ const getDashboardStats = async (req, res) => {
                 completed: completedCount,
                 totalCustomers,
                 newCustomers,
-                workingDays: activeWorkingDaysCount
+                workingDays: activeWorkingDaysCount,
+                walkinCustomers: walkinCount
             }
         });
 
